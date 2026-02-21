@@ -1,17 +1,30 @@
-﻿import React, { useState, useEffect, useRef, StrictMode } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import {
-    Home, Compass, Map, Heart, Sparkles, Palette, Utensils, MapPin, Landmark, TreePine,
+    Home, Compass, Map as MapIcon, Heart, Sparkles, Palette, Utensils, MapPin, Landmark, TreePine,
     MessageCircle, X, Send, Loader2, Calendar, Tag, ArrowRight, Search, Star,
     Navigation, Car, Clock, ChevronRight, User, ChevronLeft, Share2, IndianRupee,
     Check, MessageSquare, Users, BarChart3, LogOut, Shield, Inbox, Handshake,
     TrendingUp, Settings, Bell, Lock, Globe, Database, ExternalLink, Download,
     Trash2, RefreshCcw, Eye, EyeOff, Mail, Phone, HelpCircle, Info, Moon, FileText
 } from 'lucide-react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';l
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import { createClient } from '@supabase/supabase-js';
+
+// --- SUPABASE CLIENT ---
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+    console.warn('Supabase credentials not configured. Check your .env file.');
+}
+
+export const supabase = (supabaseUrl && supabaseAnonKey)
+    ? createClient(supabaseUrl, supabaseAnonKey)
+    : null;
 
 
 export const BottomNavItem = ({ icon: _Icon, label, active, onClick }) => {
@@ -44,7 +57,7 @@ export const BottomNav = ({ activeTab, setActiveTab }) => {
                     onClick={() => setActiveTab('explore')}
                 />
                 <BottomNavItem
-                    icon={Map}
+                    icon={MapIcon}
                     label="Map"
                     active={activeTab === 'map'}
                     onClick={() => setActiveTab('map')}
@@ -108,7 +121,7 @@ export const ChatBot = () => {
     const [messages, setMessages] = useState([
         {
             role: 'assistant',
-            content: 'Hello! I\'m your Mysuru travel assistant. Ask me anything about places to visit, local culture, food recommendations, or travel tips! ðŸŒŸ'
+            content: 'Hello! I\'m your Mysuru travel assistant. Ask me anything about places to visit, local culture, food recommendations, or travel tips!'
         }
     ]);
     const [inputMessage, setInputMessage] = useState('');
@@ -167,7 +180,7 @@ export const ChatBot = () => {
             console.error('ChatGPT Error:', error);
 
             // More detailed error message
-            let errorMessage = 'âš ï¸ Sorry, I encountered an error. ';
+            let errorMessage = 'Sorry, I encountered an error. ';
 
             if (error.message.includes('Incorrect API key')) {
                 errorMessage += 'Your OpenAI API key appears to be invalid. Please check your .env file.';
@@ -547,7 +560,7 @@ export const FeedbackSection = ({ userEmail, onSuccess }) => {
         setIsSubmitting(true);
 
         try {
-            const { supabase } = await import('../lib/supabaseClient');
+            // Use local supabase instance
 
             if (supabase) {
                 const feedbackData = {
@@ -842,7 +855,7 @@ export const ChangeView = ({ center, zoom }) => {
     return null;
 };
 
-export const Map = ({ places, destination, interactive = true }) => {
+export const MapComponent = ({ places, destination, interactive = true }) => {
     const defaultCenter = [12.3051, 76.6551]; // Mysuru Palace Area
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
@@ -874,10 +887,10 @@ export const Map = ({ places, destination, interactive = true }) => {
     };
 
     const cabOptions = [
-        { id: 'bike', type: 'Bike / Two-Wheeler', price: 'â‚¹42', time: '2 min', icon: 'ðŸï¸', description: 'Fastest in traffic' },
-        { id: 'auto', type: 'Auto Rickshaw', price: 'â‚¹68', time: '3 min', icon: 'ðŸ›º', description: 'Affordable for 3' },
-        { id: 'mini', type: 'Cab Mini', price: 'â‚¹142', time: '5 min', icon: 'ðŸš—', description: 'Compact AC cars' },
-        { id: 'prime', type: 'Cab Prime', price: 'â‚¹198', time: '6 min', icon: 'ðŸš•', description: 'Premium sedans' },
+        { id: 'bike', type: 'Bike / Two-Wheeler', price: '₹42', time: '2 min', icon: '', description: 'Fastest in traffic' },
+        { id: 'auto', type: 'Auto Rickshaw', price: '₹68', time: '3 min', icon: '', description: 'Affordable for 3' },
+        { id: 'mini', type: 'Cab Mini', price: '₹142', time: '5 min', icon: '', description: 'Compact AC cars' },
+        { id: 'prime', type: 'Cab Prime', price: '₹198', time: '6 min', icon: '', description: 'Premium sedans' },
     ];
 
     const handleBookNow = (cab) => {
@@ -976,7 +989,7 @@ export const Map = ({ places, destination, interactive = true }) => {
                 </div>
             )}
 
-            {/* Map Container - Explicit height to fix rendering issues */}
+            {/* MapComponent Container - Explicit height to fix rendering issues */}
             <div className="w-full h-full absolute inset-0 z-0" onClick={() => setShowSuggestions(false)}>
                 <MapContainer
                     center={center}
@@ -1008,7 +1021,7 @@ export const Map = ({ places, destination, interactive = true }) => {
                                     <div className="flex items-center gap-1 text-[10px] text-gray-500 mt-1">
                                         <Star size={10} className="text-yellow-500 fill-current" />
                                         <span>{place.rating}</span>
-                                        <span>â€¢</span>
+                                        <span>₹€¢</span>
                                         <span>{place.category}</span>
                                     </div>
                                 </div>
@@ -1065,7 +1078,7 @@ export const Map = ({ places, destination, interactive = true }) => {
                                             <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Estimate</span>
                                             <div className="flex items-center gap-1 mt-1">
                                                 <Car size={14} className="text-mysore-gold" />
-                                                <span className="font-bold text-base">â‚¹142</span>
+                                                <span className="font-bold text-base">₹‚¹142</span>
                                             </div>
                                         </div>
                                     </div>
@@ -1197,7 +1210,7 @@ export const Navbar = ({ onProfileClick, activeTab, setActiveTab }) => {
             <div className="hidden md:flex items-center gap-2 bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl p-1.5 rounded-full border border-gray-200 dark:border-gray-800 shadow-sm">
                 <NavLink id="home" icon={Home} label="Home" />
                 <NavLink id="explore" icon={Compass} label="Explore" />
-                <NavLink id="map" icon={Map} label="Map" />
+                <NavLink id="MapComponent" icon={MapComponent} label="MapComponent" />
                 <NavLink id="saved" icon={Heart} label="Saved" />
             </div>
 
@@ -1589,7 +1602,7 @@ export const AdminDashboard = ({ onLogout }) => {
     const loadUsers = async () => {
         setLoading(true);
         try {
-            const { supabase } = await import('../lib/supabaseClient');
+            // Use local supabase instance
 
             if (supabase) {
                 // Fetch all profiles from the custom table we created
@@ -1602,7 +1615,7 @@ export const AdminDashboard = ({ onLogout }) => {
                     const supabaseUsers = data.map(u => ({
                         fullName: u.full_name || u.fullName || 'Resident',
                         email: u.email,
-                        phone: u.phone || 'â€“',
+                        phone: u.phone || '-',
                         role: u.role || 'user',
                         joinedAt: u.updated_at || u.created_at,
                         source: 'Supabase'
@@ -1627,7 +1640,7 @@ export const AdminDashboard = ({ onLogout }) => {
 
     const loadSpotsCount = async () => {
         try {
-            const { supabase } = await import('../lib/supabaseClient');
+            // Use local supabase instance
             if (supabase) {
                 const { count, error } = await supabase
                     .from('heritage_spots')
@@ -1644,7 +1657,7 @@ export const AdminDashboard = ({ onLogout }) => {
 
     const loadFeedback = async () => {
         try {
-            const { supabase } = await import('../lib/supabaseClient');
+            // Use local supabase instance
             if (supabase) {
                 const { data, error } = await supabase
                     .from('admin_feedback')
@@ -1689,7 +1702,7 @@ export const AdminDashboard = ({ onLogout }) => {
             type: 'danger',
             onConfirm: async () => {
                 try {
-                    const { supabase } = await import('../lib/supabaseClient');
+                    // Use local supabase instance
 
                     // 1. Delete from Supabase profiles table
                     if (supabase) {
@@ -1911,7 +1924,7 @@ export const OverviewTab = ({ totalUsers, partnersCount, activeLocations, siteFe
                 title="Verified Heritage Spots"
                 value={activeLocations}
                 change="+5.2%"
-                icon={<Map className="h-7 w-7 text-emerald-600" />}
+                icon={<MapComponent className="h-7 w-7 text-emerald-600" />}
                 bg="bg-emerald-100 dark:bg-emerald-900/30"
             />
             <StatCard
@@ -1924,7 +1937,7 @@ export const OverviewTab = ({ totalUsers, partnersCount, activeLocations, siteFe
             />
         </div>
 
-        {/* Heritage Pulse Map Integration */}
+        {/* Heritage Pulse MapComponent Integration */}
         <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl rounded-[3rem] shadow-2xl p-10 border border-gray-100 dark:border-gray-800">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
                 <div>
@@ -2059,7 +2072,7 @@ export const UsersTab = ({ users, filter, setFilter, onDeleteUser }) => {
                                         </span>
                                     </td>
                                     <td className="px-10 py-8">
-                                        <div className="text-xs font-bold text-gray-500">{user.phone || 'â€“'}</div>
+                                        <div className="text-xs font-bold text-gray-500">{user.phone || '₹€“'}</div>
                                     </td>
                                     <td className="px-10 py-8 text-xs font-bold text-gray-400">
                                         {user.joinedAt ? new Date(user.joinedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Heritage Epoch'}
@@ -2095,7 +2108,7 @@ export const InvitationsTab = ({ showNotification }) => {
 
         // 1. Try Supabase
         try {
-            const { supabase } = await import('../lib/supabaseClient');
+            // Use local supabase instance
             if (supabase) {
                 const { data, error } = await supabase
                     .from('partner_applications')
@@ -2138,7 +2151,7 @@ export const InvitationsTab = ({ showNotification }) => {
 
     const handleStatusUpdate = async (invite, newStatus) => {
         try {
-            const { supabase } = await import('../lib/supabaseClient');
+            // Use local supabase instance
 
             // 1. Update Cloud (if applicable)
             if (supabase && invite.source === 'cloud') {
@@ -2850,7 +2863,7 @@ export const PartnerDashboard = ({ onLogout, partnerData }) => {
 
     const loadSpotFeedback = async () => {
         try {
-            const { supabase } = await import('../lib/supabaseClient');
+            // Use local supabase instance
             if (supabase && partnerData?.spotName) {
                 const { data, error } = await supabase
                     .from('partner_feedback')
@@ -2896,19 +2909,19 @@ export const PartnerDashboard = ({ onLogout, partnerData }) => {
     const renderContent = () => {
         switch (activeTab) {
             case 'overview':
-                return <OverviewTab spot={spotData} setActiveTab={setActiveTab} feedbacks={feedbacks} />;
+                return <PartnerOverviewTab spot={spotData} setActiveTab={setActiveTab} feedbacks={feedbacks} />;
             case 'manage':
                 return <ManageSpotTab spot={spotData} showNotification={showNotification} />;
             case 'reviews':
                 return <ReviewsTab feedbacks={feedbacks} />;
             case 'invites':
-                return <InvitationsTab partner={partnerData} spot={spotData} showNotification={showNotification} />;
+                return <PartnerInvitationsTab partner={partnerData} spot={spotData} showNotification={showNotification} />;
             case 'events':
                 return <EventsTab partner={partnerData} spot={spotData} setConfirmModal={setConfirmModal} showNotification={showNotification} />;
             case 'settings':
-                return <SettingsTab partner={partnerData} />;
+                return <PartnerSettingsTab partner={partnerData} />;
             default:
-                return <OverviewTab spot={spotData} setActiveTab={setActiveTab} feedbacks={feedbacks} />;
+                return <PartnerOverviewTab spot={spotData} setActiveTab={setActiveTab} feedbacks={feedbacks} />;
         }
     };
 
@@ -2923,37 +2936,37 @@ export const PartnerDashboard = ({ onLogout, partnerData }) => {
                 </div>
 
                 <nav className="flex-1 p-6 space-y-3">
-                    <NavItem
+                    <PartnerNavItem
                         icon={<LayoutDashboard />}
                         label="Dashboard"
                         active={activeTab === 'overview'}
                         onClick={() => setActiveTab('overview')}
                     />
-                    <NavItem
+                    <PartnerNavItem
                         icon={<Store />}
                         label="Manage Spot"
                         active={activeTab === 'manage'}
                         onClick={() => setActiveTab('manage')}
                     />
-                    <NavItem
+                    <PartnerNavItem
                         icon={<MessageSquare />}
                         label="Reviews"
                         active={activeTab === 'reviews'}
                         onClick={() => setActiveTab('reviews')}
                     />
-                    <NavItem
+                    <PartnerNavItem
                         icon={<Inbox />}
                         label="Invitations"
                         active={activeTab === 'invites'}
                         onClick={() => setActiveTab('invites')}
                     />
-                    <NavItem
+                    <PartnerNavItem
                         icon={<Calendar />}
                         label="Events & Offers"
                         active={activeTab === 'events'}
                         onClick={() => setActiveTab('events')}
                     />
-                    <NavItem
+                    <PartnerNavItem
                         icon={<Settings />}
                         label="Settings"
                         active={activeTab === 'settings'}
@@ -3037,6 +3050,7 @@ export const PartnerDashboard = ({ onLogout, partnerData }) => {
     );
 };
 
+export const PartnerNavItem = ({ icon, label, active, onClick }) => (
     <button
         onClick={onClick}
         className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl font-bold text-sm transition-all duration-300 ${active
@@ -3049,10 +3063,12 @@ export const PartnerDashboard = ({ onLogout, partnerData }) => {
     </button>
 );
 
+
+export const PartnerOverviewTab = ({ spot, setActiveTab, feedbacks }) => (
     <div className="space-y-8">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
-            <StatCard
+            <PartnerStatCard
                 label="Reviews"
                 value={spot.reviewsCount}
                 trend="+5 new"
@@ -3060,7 +3076,7 @@ export const PartnerDashboard = ({ onLogout, partnerData }) => {
                 bgColor="bg-purple-50 dark:bg-purple-900/20"
                 onClick={() => setActiveTab('reviews')}
             />
-            <StatCard
+            <PartnerStatCard
                 label="Profile Views"
                 value="8"
                 trend="+18%"
@@ -3149,6 +3165,7 @@ export const PartnerDashboard = ({ onLogout, partnerData }) => {
         </div>
     </div>
 );
+
 
 export const ManageSpotTab = ({ spot }) => (
     <div className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden px-10 py-12">
@@ -3280,6 +3297,7 @@ export const ReviewsTab = ({ feedbacks }) => (
     </div>
 );
 
+export const PartnerSettingsTab = ({ partner }) => (
     <div className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-gray-800 p-12">
         <h3 className="text-3xl font-serif text-black dark:text-white mb-12">Heritage Identity</h3>
         <div className="space-y-12">
@@ -3314,6 +3332,8 @@ export const ReviewsTab = ({ feedbacks }) => (
     </div>
 );
 
+
+export const PartnerInvitationsTab = ({ partner, spot, showNotification }) => {
     const [invites, setInvites] = useState(() => {
         const stored = localStorage.getItem('collaboration_invites');
         const allInvites = stored ? JSON.parse(stored) : [];
@@ -3332,7 +3352,7 @@ export const ReviewsTab = ({ feedbacks }) => (
 
         // 1. Try Supabase
         try {
-            const { supabase } = await import('../lib/supabaseClient');
+            // Use local supabase instance
             if (supabase && partner?.email) {
                 const { data, error } = await supabase
                     .from('partner_applications')
@@ -3385,7 +3405,7 @@ export const ReviewsTab = ({ feedbacks }) => (
 
         // 1. Try Supabase
         try {
-            const { supabase } = await import('../lib/supabaseClient');
+            // Use local supabase instance
             if (supabase) {
                 const { data, error } = await supabase
                     .from('partner_applications')
@@ -3401,14 +3421,12 @@ export const ReviewsTab = ({ feedbacks }) => (
 
                 if (!error && data && data[0]) {
                     transmitted = true;
-                    // Already in local state if we wait for loadInvites or just prepend
                 }
             }
         } catch (err) {
             console.error("Cloud transmission skipped/failed:", err);
         }
 
-        // Always fallback to localStorage to ensure it "works" for the user
         const local = JSON.parse(localStorage.getItem('collaboration_invites') || '[]');
         localStorage.setItem('collaboration_invites', JSON.stringify([newInviteData, ...local]));
 
@@ -3485,6 +3503,7 @@ export const ReviewsTab = ({ feedbacks }) => (
     );
 };
 
+export const PartnerStatCard = ({ icon, label, value, trend, bgColor, onClick }) => (
     <div
         onClick={onClick}
         className="bg-white dark:bg-gray-900 p-8 rounded-[2rem] shadow-xl border border-gray-100 dark:border-gray-800 relative overflow-hidden group cursor-pointer transition-all hover:-translate-y-1"
@@ -3504,6 +3523,7 @@ export const ReviewsTab = ({ feedbacks }) => (
         <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-gray-50 dark:bg-gray-800/50 rounded-full scale-0 group-hover:scale-110 transition-transform duration-500 pointer-events-none"></div>
     </div>
 );
+
 
 export const EventsTab = ({ partner, spot, setConfirmModal, showNotification }) => {
     const [events, setEvents] = useState([]);
@@ -3525,7 +3545,7 @@ export const EventsTab = ({ partner, spot, setConfirmModal, showNotification }) 
     const loadEvents = async () => {
         setIsLoading(true);
         try {
-            const { supabase } = await import('../lib/supabaseClient');
+            // Use local supabase instance
             if (supabase && partner?.email) {
                 const { data, error } = await supabase
                     .from('heritage_events')
@@ -3547,7 +3567,7 @@ export const EventsTab = ({ partner, spot, setConfirmModal, showNotification }) 
         e.preventDefault();
         setIsCreating(true);
         try {
-            const { supabase } = await import('../lib/supabaseClient');
+            // Use local supabase instance
             if (supabase) {
                 const eventData = {
                     partner_email: partner.email,
@@ -3590,7 +3610,7 @@ export const EventsTab = ({ partner, spot, setConfirmModal, showNotification }) 
             type: 'danger',
             onConfirm: async () => {
                 try {
-                    const { supabase } = await import('../lib/supabaseClient');
+                    // Use local supabase instance
                     if (supabase) {
                         const { error } = await supabase
                             .from('heritage_events')
@@ -3684,7 +3704,7 @@ export const EventsTab = ({ partner, spot, setConfirmModal, showNotification }) 
                                     type="text"
                                     value={newEvent.price}
                                     onChange={e => setNewEvent({ ...newEvent, price: e.target.value })}
-                                    placeholder="Free or â‚¹ Amount"
+                                    placeholder="Free or ₹‚¹ Amount"
                                     className="w-full px-6 py-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-gray-800/50 text-black dark:text-white focus:ring-2 focus:ring-[#D4AF37]/20 outline-none transition-all font-medium"
                                 />
                             </div>
@@ -3963,7 +3983,7 @@ export const AboutView = ({ onBack }) => (
                 Discover hidden gems, local artisans, and authentic culinary experiences curated just for you.
             </p>
             <div className="mt-8 text-xs text-gray-400 dark:text-gray-600">
-                Â© 2025 Mysuru Marga. All rights reserved.
+                © 2025 Mysuru Marga. All rights reserved.
             </div>
         </div>
     </>
@@ -4030,21 +4050,6 @@ export const ToggleItem = ({ icon: _Icon, label, defaultChecked, checked, onTogg
 };
 
 
-
-
-
-// --- SUPABASE CLIENT ---
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-    console.warn('âš ï¸ Supabase credentials not configured. Check your .env file.');
-}
-
-export const supabase = (supabaseUrl && supabaseAnonKey)
-    ? createClient(supabaseUrl, supabaseAnonKey)
-    : null;
-
 // --- STATIC DATA ---
 export const featuredPlaces = [
     {
@@ -4074,7 +4079,7 @@ export const popularPlaces = [
     }
 ];
 
-const allPlacesMap = new Map();
+const allPlacesMap = new MapComponent();
 [...featuredPlaces, ...popularPlaces].forEach(place => {
     allPlacesMap.set(place.id, place);
 });
@@ -4132,7 +4137,7 @@ function App() {
             if (error) throw error;
 
             if (data && data.length > 0) {
-                // Map Supabase data to the application format
+                // MapComponent Supabase data to the application format
                 const supabaseSpots = data.map(s => ({
                     id: s.id,
                     title: s.title,
@@ -4437,7 +4442,7 @@ function App() {
                         userEmail={userData?.email}
                         onGetDirections={(place) => {
                             setMapDestination(place);
-                            setActiveTab('map');
+                            setActiveTab('MapComponent');
                         }}
                     />
                 );
@@ -4451,7 +4456,7 @@ function App() {
                             onCardClick={handleFeaturedCardClick}
                             savedPlaceIds={savedPlaceIds}
                             onToggleSave={toggleSave}
-                            onSeeAllClick={() => setActiveTab('map')}
+                            onSeeAllClick={() => setActiveTab('MapComponent')}
                         />
                         <EventsSection events={events} />
                     </>
@@ -4465,8 +4470,8 @@ function App() {
                         onCardClick={handlePlaceClick}
                     />
                 );
-            case 'map':
-                return <Map places={spots} destination={mapDestination} />;
+            case 'MapComponent':
+                return <MapComponent places={spots} destination={mapDestination} />;
             case 'saved':
                 return (
                     <Saved
@@ -4498,7 +4503,7 @@ function App() {
         <div className="min-h-screen bg-mysore-light dark:bg-mysore-dark transition-colors duration-200 selection:bg-[#D4AF37]/30 flex flex-col">
             {!supabase && (
                 <div className="bg-red-500 text-white text-[10px] py-1 px-4 text-center font-bold animate-pulse z-50">
-                    âš ï¸ DEMO MODE: Supabase not connected. Check your .env file!
+                    DEMO MODE: Supabase not connected. Check your .env file!
                 </div>
             )}
 
@@ -4514,7 +4519,7 @@ function App() {
                 </div>
             )}
 
-            <div className={`flex-1 ${activeTab !== 'map' && activeTab !== 'details' ? 'overflow-y-auto pb-24 md:pb-0 custom-scrollbar' : 'overflow-hidden h-[calc(100vh-64px)]'}`}>
+            <div className={`flex-1 ${activeTab !== 'MapComponent' && activeTab !== 'details' ? 'overflow-y-auto pb-24 md:pb-0 custom-scrollbar' : 'overflow-hidden h-[calc(100vh-64px)]'}`}>
                 <div className="max-w-7xl mx-auto w-full h-full">
                     {renderContent()}
                 </div>
