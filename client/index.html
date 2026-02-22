@@ -8,6 +8,19 @@
   <title>Mysuru Marga - Explore the Soul of Mysore</title>
   <meta name="description" content="Discover the best of Mysuru with Mysuru Marga. Explore heritage sites, local culture, food, and hidden gems in the City of Palaces." />
   <meta name="keywords" content="Mysuru, Mysore, Tourism, Heritage, Travel, India, Palace, Yoga" />
+  <!-- Prevent dark-mode flash: apply saved theme before React renders -->
+  <script>
+    (function() {
+      try {
+        var t = localStorage.getItem('theme');
+        if (t === 'dark') document.documentElement.classList.add('dark');
+      } catch(e) {}
+    })();
+  </script>
+  <style>
+    body { background-color: #f8f9fa; }
+    html.dark body { background-color: #111827; }
+  </style>
 </head>
 
 <body>

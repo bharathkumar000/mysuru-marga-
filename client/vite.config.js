@@ -1,14 +1,18 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import OpenAI from 'openai'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
-  // Load env file based on `mode` in the current working directory.
-  // Set the third parameter to '' to load all env regardless of the `VITE_` prefix.
-  const env = loadEnv(mode, process.cwd(), '')
+  // Load .env from the project root (one level above client/)
+  const env = loadEnv(mode, path.resolve(__dirname, '..'), '')
 
   return {
+    envDir: '../',  // Load .env from project root (one level up from client/)
     plugins: [
       react(),
       {
@@ -31,18 +35,17 @@ export default defineConfig(({ mode }) => {
             try {
               const { messages } = JSON.parse(data || '{}')
 
-              // Check for API Key
-              if (!env.OPENAI_API_KEY) {
+              const apiKey = env.OPENAI_API_KEY || env.VITE_OPENAI_API_KEY;
+              if (!apiKey) {
                 console.error("Missing OPENAI_API_KEY in .env file")
                 res.statusCode = 500
                 res.setHeader('Content-Type', 'application/json')
-                // Return a structure that ChatBot.jsx expects
                 res.end(JSON.stringify({ error: 'Missing OPENAI_API_KEY in .env file' }))
                 return
               }
 
               const openai = new OpenAI({
-                apiKey: env.OPENAI_API_KEY,
+                apiKey,
               })
 
               const completion = await openai.chat.completions.create({

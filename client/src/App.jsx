@@ -1211,7 +1211,7 @@ export const Navbar = ({ onProfileClick, activeTab, setActiveTab }) => {
             <div className="hidden md:flex items-center gap-2 bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl p-1.5 rounded-full border border-gray-200 dark:border-gray-800 shadow-sm">
                 <NavLink id="home" icon={Home} label="Home" />
                 <NavLink id="explore" icon={Compass} label="Explore" />
-                <NavLink id="MapComponent" icon={MapComponent} label="MapComponent" />
+                <NavLink id="MapComponent" icon={MapIcon} label="Map" />
                 <NavLink id="saved" icon={Heart} label="Saved" />
             </div>
 
@@ -1925,7 +1925,7 @@ export const OverviewTab = ({ totalUsers, partnersCount, activeLocations, siteFe
                 title="Verified Heritage Spots"
                 value={activeLocations}
                 change="+5.2%"
-                icon={<MapComponent className="h-7 w-7 text-emerald-600" />}
+                icon={<MapIcon className="h-7 w-7 text-emerald-600" />}
                 bg="bg-emerald-100 dark:bg-emerald-900/30"
             />
             <StatCard
@@ -4080,7 +4080,7 @@ export const popularPlaces = [
     }
 ];
 
-const allPlacesMap = new MapComponent();
+const allPlacesMap = new Map();
 [...featuredPlaces, ...popularPlaces].forEach(place => {
     allPlacesMap.set(place.id, place);
 });
@@ -4112,7 +4112,8 @@ function App() {
         return null;
     });
     const [activeTab, setActiveTab] = useState(() => {
-        return localStorage.getItem('activeTab') || 'home';
+        const saved = localStorage.getItem('activeTab');
+        return (saved && saved !== 'details') ? saved : 'home';
     });
     const [selectedPlace, setSelectedPlace] = useState(null);
     const [mapDestination, setMapDestination] = useState(null);
@@ -4138,7 +4139,7 @@ function App() {
             if (error) throw error;
 
             if (data && data.length > 0) {
-                // MapComponent Supabase data to the application format
+                // Map Supabase data to the application format
                 const supabaseSpots = data.map(s => ({
                     id: s.id,
                     title: s.title,
@@ -4183,7 +4184,9 @@ function App() {
 
     // Persist Tab
     React.useEffect(() => {
-        localStorage.setItem('activeTab', activeTab);
+        if (activeTab !== 'details') {
+            localStorage.setItem('activeTab', activeTab);
+        }
     }, [activeTab]);
 
     // Handle dark mode persistence
