@@ -83,8 +83,11 @@ export const BottomNav = ({ activeTab, setActiveTab }) => {
 };
 
 
-export const CategoryItem = ({ icon: _Icon, label, color, bgColor }) => (
-    <div className="flex flex-col items-center gap-3 min-w-[80px] group cursor-pointer">
+export const CategoryItem = ({ icon: _Icon, label, color, bgColor, onClick }) => (
+    <div
+        onClick={() => onClick && onClick(label)}
+        className="flex flex-col items-center gap-3 min-w-[80px] group cursor-pointer"
+    >
         <div className={`w-16 h-16 rounded-full ${bgColor} flex items-center justify-center shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:shadow-md`}>
             <_Icon className={`w-7 h-7 ${color}`} />
         </div>
@@ -92,7 +95,7 @@ export const CategoryItem = ({ icon: _Icon, label, color, bgColor }) => (
     </div>
 );
 
-export const Categories = ({ onSeeAllClick }) => {
+export const Categories = ({ onSeeAllClick, onCategoryClick }) => {
     const categories = [
         { icon: LayoutDashboard, label: "Explore", color: "text-blue-600 dark:text-blue-400", bgColor: "bg-blue-50 dark:bg-blue-900/20" },
         { icon: Sparkles, label: "Hidden Gems", color: "text-mysore-600 dark:text-mysore-400", bgColor: "bg-mysore-100 dark:bg-mysore-900/20" },
@@ -118,7 +121,7 @@ export const Categories = ({ onSeeAllClick }) => {
 
             <div className="flex overflow-x-auto gap-4 px-8 pb-4 custom-scrollbar snap-x md:flex md:flex-wrap md:justify-around md:px-12 md:pb-0 md:overflow-visible md:gap-8">
                 {categories.map((cat, index) => (
-                    <CategoryItem key={index} {...cat} />
+                    <CategoryItem key={index} {...cat} onClick={onCategoryClick} />
                 ))}
             </div>
         </div>
@@ -200,19 +203,28 @@ export const EventsSection = ({ events = [] }) => {
 };
 
 
-export const Explore = ({ places, onCardClick, savedPlaceIds = [], onToggleSave }) => {
+export const Explore = ({ places, onCardClick, savedPlaceIds = [], onToggleSave, selectedCategory, onCategoryClick }) => {
     const [searchQuery, setSearchQuery] = useState('');
 
-    const filteredPlaces = places.filter(place =>
-        place.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        place.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        place.description.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredPlaces = places.filter(place => {
+        const matchesSearch = place.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            place.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            place.description.toLowerCase().includes(searchQuery.toLowerCase());
+
+        const matchesCategory = !selectedCategory || selectedCategory === 'Explore' ||
+            place.category.toLowerCase().includes(selectedCategory.toLowerCase()) ||
+            (selectedCategory === 'Hidden Gems' && place.category === 'Hidden Gem');
+
+        // Only show "famous" places (rating >= 4.5)
+        const isFamous = place.rating >= 4.5;
+
+        return matchesSearch && matchesCategory && isFamous;
+    });
 
     return (
-        <div className="pb-32 bg-white dark:bg-gray-950 min-h-screen">
-            <div className="sticky top-0 bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl z-30 px-8 md:px-12 py-6 border-b border-gray-100 dark:border-gray-900 transition-all">
-                <div className="relative max-w-2xl">
+        <div className="pb-32 bg-mysore-50 dark:bg-gray-950 min-h-screen">
+            <div className="sticky top-0 bg-mysore-50/80 dark:bg-gray-950/80 backdrop-blur-xl z-30 px-8 md:px-12 py-6 border-b border-gray-100 dark:border-gray-900 transition-all">
+                <div className="relative w-full">
                     <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <input
                         type="text"
@@ -225,14 +237,19 @@ export const Explore = ({ places, onCardClick, savedPlaceIds = [], onToggleSave 
             </div>
 
             <div className="mt-8">
-                <Categories />
+                <Categories onCategoryClick={onCategoryClick} />
             </div>
 
             <div className="px-8 md:px-12 py-10">
                 <div className="flex items-center justify-between mb-8">
-                    <h3 className="text-3xl font-serif text-gray-900 dark:text-white">
-                        {searchQuery ? `Search Results (${filteredPlaces.length})` : 'All Experiences'}
-                    </h3>
+                    <div className="flex flex-col gap-1">
+                        <h3 className="text-3xl font-serif text-gray-900 dark:text-white">
+                            {selectedCategory && selectedCategory !== 'Explore' ? selectedCategory : 'All Experiences'}
+                        </h3>
+                        {searchQuery && (
+                            <p className="text-xs text-gray-400 font-medium">Showing results for "{searchQuery}"</p>
+                        )}
+                    </div>
                     <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#D4AF37]">
                         <Compass size={14} />
                         <span>Discovering Mysuru</span>
@@ -330,8 +347,8 @@ export const FeaturedCard = ({ place, onClick, isSaved, onToggleSave }) => (
 );
 
 export const FeaturedSection = ({ places = [], onCardClick, savedPlaceIds = [], onToggleSave, onSeeAllClick }) => {
-    // Show first 5 places from the dynamic list for mobile scroll, or 4 for desktop grid
-    const displayPlaces = places.length > 0 ? places.slice(0, 5) : featuredPlaces;
+    // Show all available places in the featured grid
+    const displayPlaces = places.length > 0 ? places : featuredPlaces;
 
     return (
         <div className="py-8 transition-colors duration-200">
@@ -4259,15 +4276,48 @@ export const ToggleItem = ({ icon: _Icon, label, defaultChecked, checked, onTogg
 // --- STATIC DATA ---
 export const featuredPlaces = [
     {
-        id: 'karanji-lake',
-        title: "Karanji Lake",
-        category: "Nature",
-        categoryColor: "bg-green-500",
-        description: "Serene nature trail with butterfly park and panoramic palace views",
-        location: "Siddhartha Layout",
-        rating: 4.3,
-        coords: [12.3021, 76.6715],
-        image: "/karanji.jpg"
+        id: 'palace-illumination',
+        title: "Mysore Palace Illumination",
+        category: "Festival",
+        categoryColor: "bg-amber-500",
+        description: "The crown jewel of Dasara, glowing with nearly 100,000 incandescent bulbs in a majestic night display.",
+        location: "City Center",
+        rating: 4.9,
+        coords: [12.3051, 76.6551],
+        image: "https://images.unsplash.com/photo-1582298538104-fe2e74c27f59?auto=format&fit=crop&q=80&w=1000"
+    },
+    {
+        id: 'dasara-exhibition',
+        title: "Dasara Exhibition",
+        category: "Entertainment",
+        categoryColor: "bg-purple-600",
+        description: "A festive wonderland of colorful lights, amusement rides, and vibrant stalls at the Doddakere Maidana.",
+        location: "Exhibition Grounds",
+        rating: 4.7,
+        coords: [12.3015, 76.6590],
+        image: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&q=80&w=1000"
+    },
+    {
+        id: 'chamundi-night',
+        title: "Chamundi Hill Night View",
+        category: "Scenic",
+        categoryColor: "bg-blue-600",
+        description: "Witness the 'City of Lights' from 3,489 feet, where Mysore resembles a glowing carpet of gold.",
+        location: "Hill Top Viewpoint",
+        rating: 4.8,
+        coords: [12.2753, 76.6701],
+        image: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&q=80&w=1000"
+    },
+    {
+        id: 'philomena-night',
+        title: "St. Philomena's (Night)",
+        category: "Heritage",
+        categoryColor: "bg-indigo-600",
+        description: "The neo-gothic cathedral towers illuminated against the night sky, creating a mystical atmosphere.",
+        location: "Ashoka Road",
+        rating: 4.7,
+        coords: [12.3209, 76.6593],
+        image: "https://images.unsplash.com/photo-1548013146-72479768bbaa?auto=format&fit=crop&q=80&w=1000"
     }
 ];
 
@@ -4317,17 +4367,6 @@ export const popularPlaces = [
         image: "/zoo.png"
     },
     {
-        id: 'brindavan-gardens',
-        title: "Brindavan Gardens",
-        category: "Nature",
-        categoryColor: "bg-emerald-500",
-        description: "Terraced garden near KRS Dam, famous for its symmetrical design and musical fountain.",
-        location: "KRS Dam Road",
-        rating: 4.5,
-        coords: [12.4219, 76.5726],
-        image: "/brindavan.png"
-    },
-    {
         id: 'jaganmohan-palace',
         title: "Jaganmohan Palace",
         category: "Heritage",
@@ -4348,6 +4387,193 @@ export const popularPlaces = [
         rating: 4.3,
         coords: [12.3021, 76.6715],
         image: "/karanji.jpg"
+    },
+    {
+        id: 'kukkarahalli-lake',
+        title: "Kukkarahalli Lake",
+        category: "Nature",
+        categoryColor: "bg-green-600",
+        description: "A favorite spot for birdwatchers and walkers, especially during sunset.",
+        location: "Saraswathipuram",
+        rating: 4.5,
+        coords: [12.3082, 76.6341],
+        image: "/kukkarahalli.png"
+    },
+    {
+        id: 'sand-sculpture',
+        title: "Sand Sculpture Museum",
+        category: "Heritage",
+        categoryColor: "bg-amber-600",
+        description: "Unique museum featuring intricate sand sculptures of heritage themes.",
+        location: "Chamundi Hill Road",
+        rating: 4.4,
+        coords: [12.2855, 76.6782],
+        image: "/sand_sculpture.png"
+    },
+    {
+        id: 'rail-museum',
+        title: "Mysore Rail Museum",
+        category: "Heritage",
+        categoryColor: "bg-amber-700",
+        description: "Features vintage locomotives and galleries documenting rail history.",
+        location: "KRS Road",
+        rating: 4.6,
+        coords: [12.3168, 76.6434],
+        image: "/rail_museum.png"
+    },
+    {
+        id: 'lingambudhi-lake',
+        title: "Lingambudhi Lake",
+        category: "Nature",
+        categoryColor: "bg-green-500",
+        description: "A tranquil perennial lake known for its biodiversity and walking paths.",
+        location: "Ramakrishna Nagar",
+        rating: 4.2,
+        coords: [12.2685, 76.6214],
+        image: "/lingambudhi.png"
+    },
+    {
+        id: 'sandalwood-carving',
+        title: "Sandalwood Carving Artisan",
+        category: "Artisans",
+        categoryColor: "bg-rose-600",
+        description: "Authentic workshop showing the delicate art of carving Mysore sandalwood.",
+        location: "Mandi Mohalla",
+        rating: 4.8,
+        coords: [12.3214, 76.6521],
+        image: "/sandalwood.png"
+    },
+    {
+        id: 'silk-weaving',
+        title: "Mysore Silk Weaving",
+        category: "Artisans",
+        categoryColor: "bg-rose-500",
+        description: "Witness the creation of the world-famous Mysore Silk sarees with gold zari.",
+        location: "KSIC Factory",
+        rating: 4.7,
+        coords: [12.2905, 76.6452],
+        image: "/silk.png"
+    },
+    {
+        id: 'mylari-dosa',
+        title: "Original Mylari Dosa",
+        category: "Food",
+        categoryColor: "bg-emerald-600",
+        description: "Legendary breakfast spot known for its unique, cloud-soft butter dosas.",
+        location: "Nazarbad",
+        rating: 4.9,
+        coords: [12.3090, 76.6660],
+        image: "/mylari.png"
+    },
+    {
+        id: 'mysore-pak',
+        title: "Traditional Mysore Pak",
+        category: "Food",
+        categoryColor: "bg-emerald-500",
+        description: "Taste the authentic melt-in-your-mouth sweet that defined Mysore's cuisine.",
+        location: "Guru Sweets",
+        rating: 4.8,
+        coords: [12.3045, 76.6545],
+        image: "/mysorepak.png"
+    },
+    {
+        id: 'devaraja-market',
+        title: "Devaraja Market",
+        category: "Heritage",
+        categoryColor: "bg-amber-600",
+        description: "Vibrant local market with piles of kumkum, flowers, and local produce.",
+        location: "City Center",
+        rating: 4.6,
+        coords: [12.3105, 76.6515],
+        image: "/devaraja.png"
+    },
+    {
+        id: 'chamundi-trek',
+        title: "Chamundi Hill Steps Trek",
+        category: "Adventure",
+        categoryColor: "bg-orange-600",
+        description: "Challenge yourself with the 1,008 steps climb to the summit for breathtaking city views.",
+        location: "Chamundi Hills",
+        rating: 4.9,
+        coords: [12.2753, 76.6701],
+        image: "https://images.unsplash.com/photo-1551632432-c735eef10bc1?auto=format&fit=crop&q=80&w=1000"
+    },
+    {
+        id: 'varuna-lake',
+        title: "Varuna Lake Water Sports",
+        category: "Adventure",
+        categoryColor: "bg-orange-600",
+        description: "Enjoy jet skiing, kayaking, and banana boat rides on the outskirts of the city.",
+        location: "T. Narsipura Road",
+        rating: 4.5,
+        coords: [12.2612, 76.7123],
+        image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&q=80&w=1000"
+    },
+    {
+        id: 'grs-fantasy',
+        title: "GRS Fantasy Park",
+        category: "Adventure",
+        categoryColor: "bg-orange-600",
+        description: "Mysuru's premier water & amusement park with thrilling slides and a virtual 5D ride.",
+        location: "KRS Road (8km)",
+        rating: 4.6,
+        coords: [12.3524, 76.6214],
+        image: "https://images.unsplash.com/photo-1513889961551-6ad87a513c7a?auto=format&fit=crop&q=80&w=1000"
+    },
+    {
+        id: 'kunti-betta',
+        title: "Kunti Betta Night Trek",
+        category: "Adventure",
+        categoryColor: "bg-orange-600",
+        description: "A thrilling night trek near Pandavapura, famous for its sunrise and Tonnur Lake view.",
+        location: "Pandavapura (28km)",
+        rating: 4.8,
+        coords: [12.4812, 76.6715],
+        image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=1000"
+    },
+    {
+        id: 'srirangapatna-coracle',
+        title: "Srirangapatna Coracle Ride",
+        category: "Adventure",
+        categoryColor: "bg-orange-600",
+        description: "Experience a traditional coracle ride through the Cauvery at the Sangama holy site.",
+        location: "Srirangapatna (18km)",
+        rating: 4.4,
+        coords: [12.4258, 76.6575],
+        image: "https://images.unsplash.com/photo-1504198453319-5ce911baf2ea?auto=format&fit=crop&q=80&w=1000"
+    },
+    {
+        id: 'balmuri-falls',
+        title: "Balmuri Falls Splash",
+        category: "Adventure",
+        categoryColor: "bg-orange-600",
+        description: "A popular spot for river walks, photography and a refreshing splash in the Cauvery.",
+        location: "KRS Road (15km)",
+        rating: 4.3,
+        coords: [12.4214, 76.5912],
+        image: "https://images.unsplash.com/photo-1433086566547-0243403505bb?auto=format&fit=crop&q=80&w=1000"
+    },
+    {
+        id: 'lalitha-mahal-stay',
+        title: "Lalitha Mahal Palace",
+        category: "Stays",
+        categoryColor: "bg-purple-600",
+        description: "Live like royalty in this glistening white palace hotel built for the Maharaja's guests.",
+        location: "Siddharta Nagar",
+        rating: 4.8,
+        coords: [12.3021, 76.6912],
+        image: "/lalithmahal.png"
+    },
+    {
+        id: 'metropole-stay',
+        title: "Royal Orchid Metropole",
+        category: "Stays",
+        categoryColor: "bg-purple-600",
+        description: "Heritage hotel offering vintage charm and personalized luxury in a quiet enclave.",
+        location: "JLB Road",
+        rating: 4.7,
+        coords: [12.3061, 76.6412],
+        image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=1000"
     }
 ];
 
@@ -4386,6 +4612,7 @@ function App() {
         const saved = localStorage.getItem('activeTab');
         return (saved && saved !== 'details') ? saved : 'home';
     });
+    const [selectedCategory, setSelectedCategory] = useState(null);
     const [selectedPlace, setSelectedPlace] = useState(null);
     const [mapDestination, setMapDestination] = useState(null);
     const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -4721,9 +4948,18 @@ function App() {
                 return (
                     <>
                         <Hero onExploreClick={() => setActiveTab('explore')} />
-                        <Categories onSeeAllClick={() => setActiveTab('explore')} />
+                        <Categories
+                            onSeeAllClick={() => {
+                                setSelectedCategory(null);
+                                setActiveTab('explore');
+                            }}
+                            onCategoryClick={(category) => {
+                                setSelectedCategory(category);
+                                setActiveTab('explore');
+                            }}
+                        />
                         <FeaturedSection
-                            places={spots}
+                            places={spots.slice(0, 4)}
                             onCardClick={handleFeaturedCardClick}
                             savedPlaceIds={savedPlaceIds}
                             onToggleSave={toggleSave}
@@ -4739,6 +4975,8 @@ function App() {
                         savedPlaceIds={savedPlaceIds}
                         onToggleSave={toggleSave}
                         onCardClick={handlePlaceClick}
+                        selectedCategory={selectedCategory}
+                        onCategoryClick={setSelectedCategory}
                     />
                 );
             case 'MapComponent':
@@ -4778,7 +5016,10 @@ function App() {
                         <Navbar
                             onProfileClick={() => setActiveTab('profile')}
                             activeTab={activeTab}
-                            setActiveTab={setActiveTab}
+                            setActiveTab={(id) => {
+                                if (id === 'explore') setSelectedCategory(null);
+                                setActiveTab(id);
+                            }}
                         />
                     </div>
                 </div>
