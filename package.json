@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite client",
-    "build": "vite build client",
+    "build": "vite build client --outDir ../dist",
     "lint": "eslint client",
     "preview": "vite preview client"
   },
