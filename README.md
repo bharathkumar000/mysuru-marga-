@@ -1,4 +1,4 @@
-# Mysuru Marga - Soulful Heritage Explorer
+# Mysuru Marga - srinivas - Soulful Heritage Explorer
 
 A premium, state-of-the-art web application dedicated to exploring the rich heritage, hidden gems, and local artisans of Mysuru.
 
