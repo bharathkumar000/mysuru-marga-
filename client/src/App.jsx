@@ -4280,11 +4280,9 @@ function App() {
     };
 
     return (
-        <div className="min-h-screen bg-mysore-light dark:bg-mysore-dark transition-colors duration-200 selection:bg-[#D4AF37]/30 flex flex-col">
-
-
+        <div className="h-screen w-screen overflow-hidden bg-mysore-light dark:bg-mysore-dark transition-colors duration-200 selection:bg-[#D4AF37]/30 flex flex-col fixed inset-0">
             {activeTab !== 'profile' && activeTab !== 'details' && (
-                <div className="sticky top-0 z-40 bg-mysore-light/80 dark:bg-mysore-dark/80 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800">
+                <div className="sticky top-0 z-40 bg-mysore-light/80 dark:bg-mysore-dark/80 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800 pt-[env(safe-area-inset-top)]">
                     <div className="max-w-7xl mx-auto w-full">
                         <Navbar
                             onProfileClick={() => setActiveTab('profile')}
@@ -4295,19 +4293,17 @@ function App() {
                 </div>
             )}
 
-            <div className={`flex-1 ${activeTab !== 'MapComponent' && activeTab !== 'details' ? 'overflow-y-auto pb-24 md:pb-0 custom-scrollbar' : 'overflow-hidden h-[calc(100vh-64px)]'}`}>
+            <div className={`flex-1 relative ${activeTab !== 'MapComponent' && activeTab !== 'details' ? 'overflow-y-auto pb-24 md:pb-0 custom-scrollbar' : 'overflow-hidden'}`}>
                 <div className="max-w-7xl mx-auto w-full h-full">
                     {renderContent()}
                 </div>
             </div>
 
             {activeTab !== 'profile' && activeTab !== 'details' && (
-                <div className="md:hidden fixed bottom-0 left-0 right-0 z-50">
+                <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 pb-[env(safe-area-inset-bottom)] bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-t border-gray-100 dark:border-gray-800">
                     <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
                 </div>
             )}
-
-
         </div>
     );
 }
