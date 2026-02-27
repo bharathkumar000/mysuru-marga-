@@ -4492,7 +4492,7 @@ export const popularPlaces = [
         location: "Chamundi Hills",
         rating: 4.8,
         coords: [12.2753, 76.6701],
-        image: "https://images.unsplash.com/photo-1623861214041-55c3258c407f?q=80&w=2600&auto=format&fit=crop"
+        image: "/chamundi.png"
     },
     {
         id: 'st-philomenas',
@@ -4503,7 +4503,7 @@ export const popularPlaces = [
         location: "Ashoka Road",
         rating: 4.7,
         coords: [12.3209, 76.6593],
-        image: "https://images.unsplash.com/photo-1623861214013-432886f44d5c?q=80&w=2600&auto=format&fit=crop"
+        image: "/philomena.png"
     },
     {
         id: 'mysore-zoo',
@@ -4514,7 +4514,7 @@ export const popularPlaces = [
         location: "Indiranagar",
         rating: 4.6,
         coords: [12.3021, 76.6644],
-        image: "https://images.unsplash.com/photo-1544550581-226e10398453?q=80&w=2600&auto=format&fit=crop"
+        image: "/zoo.png"
     },
     {
         id: 'brindavan-gardens',
@@ -4525,7 +4525,7 @@ export const popularPlaces = [
         location: "KRS Dam Road",
         rating: 4.5,
         coords: [12.4219, 76.5726],
-        image: "https://images.unsplash.com/photo-1582234053351-4096053f3e1f?q=80&w=2600&auto=format&fit=crop"
+        image: "/brindavan.png"
     },
     {
         id: 'jaganmohan-palace',
@@ -4536,7 +4536,7 @@ export const popularPlaces = [
         location: "City Center",
         rating: 4.4,
         coords: [12.3061, 76.6501],
-        image: "https://images.unsplash.com/photo-1605367808381-8b093ca2879f?q=80&w=2600&auto=format&fit=crop"
+        image: "/jaganmohan.png"
     },
     {
         id: 'karanji-lake',
