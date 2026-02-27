@@ -1,4 +1,5 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     Home, Compass, Map as MapIcon, Heart, Sparkles, Palette, Utensils, MapPin, Landmark, TreePine,
     MessageCircle, X, Send, Loader2, Calendar, Tag, ArrowRight, ArrowLeft, Search, Star,
@@ -200,30 +201,31 @@ export const BottomNavItem = ({ icon: _Icon, label, active, onClick }) => {
 };
 
 export const BottomNav = ({ activeTab, setActiveTab }) => {
+    const { t } = useTranslation();
     return (
         <div className="w-full bg-white/80 dark:bg-gray-950/80 backdrop-blur-2xl border-t border-white/20 dark:border-gray-800 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] h-24 pb-8 md:pb-2 z-50 shrink-0 transition-colors duration-200 rounded-t-[2.5rem]">
             <div className="flex justify-around items-center h-full px-4">
                 <BottomNavItem
                     icon={Home}
-                    label="Home"
+                    label={t('home')}
                     active={activeTab === 'home'}
                     onClick={() => setActiveTab('home')}
                 />
                 <BottomNavItem
                     icon={Compass}
-                    label="Explore"
+                    label={t('explore')}
                     active={activeTab === 'explore'}
                     onClick={() => setActiveTab('explore')}
                 />
                 <BottomNavItem
                     icon={MapIcon}
-                    label="Map"
+                    label={t('map')}
                     active={activeTab === 'map'}
                     onClick={() => setActiveTab('map')}
                 />
                 <BottomNavItem
                     icon={Heart}
-                    label="Saved"
+                    label={t('saved')}
                     active={activeTab === 'saved'}
                     onClick={() => setActiveTab('saved')}
                 />
@@ -1149,6 +1151,7 @@ export const MapComponent = ({ places, destination, interactive = true }) => {
 
 
 export const Navbar = ({ onProfileClick, activeTab, setActiveTab }) => {
+    const { t } = useTranslation();
     const NavLink = ({ id, icon: Icon, label }) => (
         <button
             onClick={() => setActiveTab(id)}
@@ -3226,6 +3229,7 @@ export const TravaAI = ({ onBack }) => {
 
 
 export const PartnerDashboard = ({ onLogout, partnerData }) => {
+    const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState('overview');
     const [feedbacks, setFeedbacks] = useState([]);
     const [confirmModal, setConfirmModal] = useState({ show: false, title: '', message: '', onConfirm: null, type: 'danger' });
@@ -3305,44 +3309,44 @@ export const PartnerDashboard = ({ onLogout, partnerData }) => {
             <aside className="w-64 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-r border-gray-100 dark:border-gray-800 hidden md:flex flex-col fixed h-full z-30">
                 <div className="p-8 border-b border-gray-100 dark:border-gray-800">
                     <h1 className="text-2xl font-serif text-black dark:text-white tracking-tight">
-                        Mysuru <span className="font-bold text-[#D4AF37]">Partner</span>
+                        Mysuru <span className="font-bold text-[#D4AF37]">{t('mysuruPartner')}</span>
                     </h1>
                 </div>
 
                 <nav className="flex-1 p-6 space-y-3">
                     <PartnerNavItem
                         icon={<LayoutDashboard />}
-                        label="Dashboard"
+                        label={t('dashboardTab')}
                         active={activeTab === 'overview'}
                         onClick={() => setActiveTab('overview')}
                     />
                     <PartnerNavItem
                         icon={<Store />}
-                        label="Manage Spot"
+                        label={t('manageSpotTab')}
                         active={activeTab === 'manage'}
                         onClick={() => setActiveTab('manage')}
                     />
                     <PartnerNavItem
                         icon={<MessageSquare />}
-                        label="Reviews"
+                        label={t('reviewsTab')}
                         active={activeTab === 'reviews'}
                         onClick={() => setActiveTab('reviews')}
                     />
                     <PartnerNavItem
                         icon={<Inbox />}
-                        label="Invitations"
+                        label={t('invitationsTab')}
                         active={activeTab === 'invites'}
                         onClick={() => setActiveTab('invites')}
                     />
                     <PartnerNavItem
                         icon={<Calendar />}
-                        label="Events & Offers"
+                        label={t('eventsTab')}
                         active={activeTab === 'events'}
                         onClick={() => setActiveTab('events')}
                     />
                     <PartnerNavItem
                         icon={<Settings />}
-                        label="Settings"
+                        label={t('settingsTab')}
                         active={activeTab === 'settings'}
                         onClick={() => setActiveTab('settings')}
                     />
@@ -3354,7 +3358,7 @@ export const PartnerDashboard = ({ onLogout, partnerData }) => {
                         className="w-full flex items-center gap-3 px-5 py-4 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-2xl transition-all font-bold text-sm"
                     >
                         <LogOut className="w-5 h-5" />
-                        <span>Log Out</span>
+                        <span>{t('logout')}</span>
                     </button>
                 </div>
             </aside>
@@ -3365,15 +3369,15 @@ export const PartnerDashboard = ({ onLogout, partnerData }) => {
                     <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
                         <div>
                             <h2 className="text-4xl font-serif text-black dark:text-white">
-                                Welcome, {partnerData?.fullName?.split(' ')[0] || "Partner"}
+                                {t('welcomePartner', { name: partnerData?.fullName?.split(' ')[0] || "Partner" })}
                             </h2>
                             <p className="text-gray-400 dark:text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px] mt-2">
-                                Managing <span className="text-[#D4AF37]">"{spotData.name}"</span>
+                                {t('managing', { spotName: spotData.name })}
                             </p>
                         </div>
                         <div className="flex items-center gap-3 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm px-5 py-3 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
                             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                            <span className="text-xs font-black uppercase tracking-widest text-green-600 dark:text-green-400">Live Status</span>
+                            <span className="text-xs font-black uppercase tracking-widest text-green-600 dark:text-green-400">{t('liveStatus')}</span>
                         </div>
                     </header>
 
@@ -3438,276 +3442,300 @@ export const PartnerNavItem = ({ icon, label, active, onClick }) => (
 );
 
 
-export const PartnerOverviewTab = ({ spot, setActiveTab, feedbacks }) => (
-    <div className="space-y-8">
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
-            <PartnerStatCard
-                label="Reviews"
-                value={spot.reviewsCount}
-                trend="+5 new"
-                icon={<MessageSquare className="text-purple-600" />}
-                bgColor="bg-purple-50 dark:bg-purple-900/20"
-                onClick={() => setActiveTab('reviews')}
-            />
-            <PartnerStatCard
-                label="Profile Views"
-                value="8"
-                trend="+18%"
-                icon={<Users className="text-emerald-600" />}
-                bgColor="bg-emerald-50 dark:bg-emerald-900/20"
-                onClick={() => setActiveTab('overview')}
-            />
-        </div>
-
-        {/* Live Heritage Map Spotlight */}
-        <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl rounded-[2.5rem] shadow-xl p-10 border border-gray-100 dark:border-gray-800">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-                <div>
-                    <h3 className="text-2xl font-serif text-black dark:text-white">Heritage Map Presence</h3>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Your spot's spatial identity in the Mysuru ecosystem</p>
-                </div>
-                <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
-                    <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Live Elevation</span>
-                </div>
+export const PartnerOverviewTab = ({ spot, setActiveTab, feedbacks }) => {
+    const { t } = useTranslation();
+    return (
+        <div className="space-y-8">
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
+                <PartnerStatCard
+                    label={t('overviewReviews')}
+                    value={spot.reviewsCount}
+                    trend={t('overviewNew')}
+                    icon={<MessageSquare className="text-purple-600" />}
+                    bgColor="bg-purple-50 dark:bg-purple-900/20"
+                    onClick={() => setActiveTab('reviews')}
+                />
+                <PartnerStatCard
+                    label={t('overviewProfileViews')}
+                    value="8"
+                    trend="+18%"
+                    icon={<Users className="text-emerald-600" />}
+                    bgColor="bg-emerald-50 dark:bg-emerald-900/20"
+                    onClick={() => setActiveTab('overview')}
+                />
             </div>
-            <div className="h-[400px] rounded-[2rem] overflow-hidden border border-gray-100 dark:border-gray-700 relative shadow-inner group">
-                <MapComponent interactive={false} />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="absolute bottom-8 left-8 p-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 pointer-events-none opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500">
-                    <p className="text-white text-xs font-bold uppercase tracking-widest">Sovereign Explorer View</p>
-                </div>
-            </div>
-        </div>
 
-        {/* Spot Preview */}
-        <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl rounded-[2.5rem] p-10 shadow-xl border border-gray-100 dark:border-gray-800 transition-all hover:scale-[1.01]">
-            <div className="flex flex-col lg:flex-row gap-10">
-                <div className="w-full lg:w-1/3 h-64 rounded-3xl overflow-hidden shadow-2xl relative">
-                    <img src="/karanji.jpg" alt="Spot Preview" className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                </div>
-                <div className="flex-1 flex flex-col justify-center">
-                    <div className="flex items-center gap-2 mb-4">
-                        <span className="px-4 py-1.5 bg-[#D4AF37]/10 text-[#D4AF37] rounded-full text-[10px] font-black uppercase tracking-widest ring-1 ring-[#D4AF37]/20">{spot.category}</span>
+            {/* Live Heritage Map Spotlight */}
+            <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl rounded-[2.5rem] shadow-xl p-10 border border-gray-100 dark:border-gray-800">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+                    <div>
+                        <h3 className="text-2xl font-serif text-black dark:text-white">{t('heritageMapPresence')}</h3>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">{t('heritageMapSubtitle')}</p>
                     </div>
-                    <h3 className="text-3xl font-serif text-black dark:text-white mb-4">{spot.name}</h3>
-                    <p className="text-gray-500 dark:text-gray-400 line-clamp-2 md:line-clamp-none mb-8 font-medium leading-relaxed text-sm">
-                        {spot.description}
-                    </p>
-                    <div className="flex flex-wrap gap-8 text-[11px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">
-                        <div className="flex items-center gap-3">
-                            <MapPin size={16} className="text-[#D4AF37]" />
-                            <span>{spot.location}</span>
+                    <div className="flex items-center gap-3">
+                        <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">{t('liveElevation')}</span>
+                    </div>
+                </div>
+                <div className="h-[400px] rounded-[2rem] overflow-hidden border border-gray-100 dark:border-gray-700 relative shadow-inner group">
+                    <MapComponent interactive={false} />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div className="absolute bottom-8 left-8 p-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 pointer-events-none opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+                        <p className="text-white text-xs font-bold uppercase tracking-widest">{t('sovereignExplorerView')}</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Spot Preview */}
+            <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl rounded-[2.5rem] p-10 shadow-xl border border-gray-100 dark:border-gray-800 transition-all hover:scale-[1.01]">
+                <div className="flex flex-col lg:flex-row gap-10">
+                    <div className="w-full lg:w-1/3 h-64 rounded-3xl overflow-hidden shadow-2xl relative">
+                        <img src="/karanji.jpg" alt="Spot Preview" className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                    </div>
+                    <div className="flex-1 flex flex-col justify-center">
+                        <div className="flex items-center gap-2 mb-4">
+                            <span className="px-4 py-1.5 bg-[#D4AF37]/10 text-[#D4AF37] rounded-full text-[10px] font-black uppercase tracking-widest ring-1 ring-[#D4AF37]/20">{spot.category}</span>
                         </div>
-                        <div className="flex items-center gap-3">
-                            <Clock size={16} className="text-[#D4AF37]" />
-                            <span>{spot.openingHours}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-black dark:bg-[#D4AF37] rounded-[2rem] p-10 text-white dark:text-black relative overflow-hidden group shadow-2xl">
-                <div className="relative z-10">
-                    <h3 className="text-2xl font-serif mb-2">Boost your visibility</h3>
-                    <p className="opacity-80 font-medium mb-8 text-sm">Create a special offer for visitors and get featured on the "Near You" section.</p>
-                    <button
-                        onClick={() => setActiveTab('events')}
-                        className="bg-[#D4AF37] dark:bg-black text-black dark:text-[#D4AF37] px-8 py-4 rounded-2xl font-black flex items-center gap-3 hover:scale-105 transition-all shadow-xl text-sm"
-                    >
-                        <Sparkles size={20} />
-                        <span>Create Offer</span>
-                    </button>
-                </div>
-                <Sparkles className="absolute -bottom-4 -right-4 w-40 h-40 opacity-10 group-hover:scale-110 transition-transform duration-700" />
-            </div>
-            <div className="bg-white dark:bg-gray-900 rounded-[2rem] p-10 border border-gray-100 dark:border-gray-800 shadow-xl flex flex-col justify-center">
-                <h3 className="text-2xl font-serif text-black dark:text-white mb-2">Update your photos</h3>
-                <p className="text-gray-500 dark:text-gray-400 mb-8 font-medium text-sm">Clear photos of your work and workspace increase visitor trust by 40%.</p>
-                <div className="flex items-center gap-3">
-                    <button className="bg-gray-50 dark:bg-gray-800 text-black dark:text-white px-8 py-4 rounded-2xl font-black flex items-center gap-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all text-sm shadow-sm ring-1 ring-gray-100 dark:ring-gray-800">
-                        <Camera size={20} className="text-[#D4AF37]" />
-                        <span>Upload Photos</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-);
-
-
-export const ManageSpotTab = ({ spot }) => (
-    <div className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden px-10 py-12">
-        <h3 className="text-3xl font-serif text-black dark:text-white mb-10">Curation Details</h3>
-        <form className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                    <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Heritage Spot Name</label>
-                    <input
-                        type="text"
-                        defaultValue={spot.name}
-                        className="w-full px-6 py-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-gray-800/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#D4AF37]/20 focus:border-[#D4AF37] outline-none transition-all font-medium text-sm shadow-inner"
-                    />
-                </div>
-                <div>
-                    <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Classification</label>
-                    <select
-                        defaultValue="Hidden Gem"
-                        className="w-full px-6 py-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-gray-800/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#D4AF37]/20 focus:border-[#D4AF37] outline-none transition-all font-bold text-sm shadow-inner appearance-none cursor-pointer"
-                    >
-                        <option>Local Artisan</option>
-                        <option>Hyperlocal Food</option>
-                        <option>Hidden Gem</option>
-                        <option>Cultural Experience</option>
-                        <option>Nature</option>
-                    </select>
-                </div>
-            </div>
-
-            <div>
-                <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Soulful Narrative</label>
-                <textarea
-                    rows="4"
-                    defaultValue={spot.description}
-                    className="w-full px-6 py-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-gray-800/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#D4AF37]/20 focus:border-[#D4AF37] outline-none transition-all font-medium text-sm shadow-inner resize-none"
-                ></textarea>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div>
-                    <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Sacred Location</label>
-                    <div className="relative">
-                        <MapPin className="absolute left-5 top-1/2 -translate-y-1/2 text-[#D4AF37]" size={18} />
-                        <input
-                            type="text"
-                            defaultValue={spot.location}
-                            className="w-full pl-14 pr-6 py-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-gray-800/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#D4AF37]/20 transition-all font-medium text-sm shadow-inner"
-                        />
-                    </div>
-                </div>
-                <div>
-                    <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Traditional Hours</label>
-                    <div className="relative">
-                        <Clock className="absolute left-5 top-1/2 -translate-y-1/2 text-[#D4AF37]" size={18} />
-                        <input
-                            type="text"
-                            defaultValue={spot.openingHours}
-                            className="w-full pl-14 pr-6 py-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-gray-800/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#D4AF37]/20 transition-all font-medium text-sm shadow-inner"
-                        />
-                    </div>
-                </div>
-                <div>
-                    <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Contact Presence</label>
-                    <input
-                        type="text"
-                        placeholder="+91 XXXXX XXXXX"
-                        className="w-full px-6 py-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-gray-800/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#D4AF37]/20 transition-all font-medium text-sm shadow-inner"
-                    />
-                </div>
-            </div>
-
-            <div className="pt-6">
-                <button
-                    type="submit"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        showNotification("Heritage records preserved.");
-                    }}
-                    className="bg-black dark:bg-[#D4AF37] text-white dark:text-black px-12 py-5 rounded-2xl font-black shadow-2xl shadow-[#D4AF37]/20 active:scale-95 transition-all text-xs uppercase tracking-[0.2em]"
-                >
-                    Preserve Changes
-                </button>
-            </div>
-        </form>
-    </div>
-);
-
-export const ReviewsTab = ({ feedbacks }) => (
-    <div className="space-y-8">
-        <h3 className="text-3xl font-serif text-black dark:text-white mb-4">Traveler Echoes</h3>
-        <div className="space-y-6">
-            {feedbacks.length === 0 ? (
-                <div className="py-24 text-center bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl rounded-[2rem] border border-dashed border-gray-200 dark:border-gray-800">
-                    <MessageSquare size={64} className="mx-auto text-gray-200 dark:text-gray-800 mb-6" />
-                    <p className="text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest text-[10px]">No traveler echoes yet</p>
-                </div>
-            ) : (
-                feedbacks.map((feedback, i) => (
-                    <div key={feedback.id} className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl p-8 rounded-[2rem] shadow-xl border border-gray-100 dark:border-gray-800 transition-all hover:translate-x-1 group">
-                        <div className="flex justify-between items-start mb-6">
-                            <div className="flex gap-5">
-                                <div className="w-14 h-14 rounded-2xl bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] font-black text-xl shadow-inner group-hover:scale-110 transition-transform">
-                                    {feedback.userEmail ? feedback.userEmail.charAt(0).toUpperCase() : 'U'}
-                                </div>
-                                <div>
-                                    <h4 className="font-bold text-gray-900 dark:text-white text-sm">{feedback.userEmail || "Anonymous Traveler"}</h4>
-                                    <div className="flex text-[#D4AF37] mt-1.5 gap-0.5">
-                                        {[1, 2, 3, 4, 5].map(star => (
-                                            <Star key={star} size={12} className={star <= feedback.rating ? "fill-current" : "text-gray-300 dark:text-gray-600"} />
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-                                {new Date(feedback.timestamp).toLocaleDateString()}
-                            </span>
-                        </div>
-                        <p className="text-gray-500 dark:text-gray-400 font-medium leading-relaxed text-sm italic">
-                            "{feedback.comment}"
+                        <h3 className="text-3xl font-serif text-black dark:text-white mb-4">{spot.name}</h3>
+                        <p className="text-gray-500 dark:text-gray-400 line-clamp-2 md:line-clamp-none mb-8 font-medium leading-relaxed text-sm">
+                            {spot.description}
                         </p>
-                        <button className="mt-6 text-[#D4AF37] font-black text-[10px] uppercase tracking-widest hover:underline flex items-center gap-2">
-                            <MessageSquare size={14} />
-                            <span>Acknowledge Thought</span>
+                        <div className="flex flex-wrap gap-8 text-[11px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">
+                            <div className="flex items-center gap-3">
+                                <MapPin size={16} className="text-[#D4AF37]" />
+                                <span>{spot.location}</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <Clock size={16} className="text-[#D4AF37]" />
+                                <span>{spot.openingHours}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="bg-black dark:bg-[#D4AF37] rounded-[2rem] p-10 text-white dark:text-black relative overflow-hidden group shadow-2xl">
+                    <div className="relative z-10">
+                        <h3 className="text-2xl font-serif mb-2">{t('boostVisibility')}</h3>
+                        <p className="opacity-80 font-medium mb-8 text-sm">{t('boostVisibilityDesc')}</p>
+                        <button
+                            onClick={() => setActiveTab('events')}
+                            className="bg-[#D4AF37] dark:bg-black text-black dark:text-[#D4AF37] px-8 py-4 rounded-2xl font-black flex items-center gap-3 hover:scale-105 transition-all shadow-xl text-sm"
+                        >
+                            <Sparkles size={20} />
+                            <span>{t('createOffer')}</span>
                         </button>
                     </div>
-                ))
-            )}
-        </div>
-    </div>
-);
-
-export const PartnerSettingsTab = ({ partner }) => (
-    <div className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-gray-800 p-12">
-        <h3 className="text-3xl font-serif text-black dark:text-white mb-12">Heritage Identity</h3>
-        <div className="space-y-12">
-            <div className="flex items-center gap-8 pb-12 border-b border-gray-100 dark:border-gray-800">
-                <div className="w-24 h-24 rounded-3xl bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] shadow-inner">
-                    <Users size={40} />
+                    <Sparkles className="absolute -bottom-4 -right-4 w-40 h-40 opacity-10 group-hover:scale-110 transition-transform duration-700" />
                 </div>
+                <div className="bg-white dark:bg-gray-900 rounded-[2rem] p-10 border border-gray-100 dark:border-gray-800 shadow-xl flex flex-col justify-center">
+                    <h3 className="text-2xl font-serif text-black dark:text-white mb-2">{t('updatePhotos')}</h3>
+                    <p className="text-gray-500 dark:text-gray-400 mb-8 font-medium text-sm">{t('updatePhotosDesc')}</p>
+                    <div className="flex items-center gap-3">
+                        <button className="bg-gray-50 dark:bg-gray-800 text-black dark:text-white px-8 py-4 rounded-2xl font-black flex items-center gap-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all text-sm shadow-sm ring-1 ring-gray-100 dark:ring-gray-800">
+                            <Camera size={20} className="text-[#D4AF37]" />
+                            <span>{t('uploadPhotos')}</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+
+export const ManageSpotTab = ({ spot }) => {
+    const { t } = useTranslation();
+    return (
+        <div className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden px-10 py-12">
+            <h3 className="text-3xl font-serif text-black dark:text-white mb-10">{t('curationDetails')}</h3>
+            <form className="space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">{t('heritageSpotName')}</label>
+                        <input
+                            type="text"
+                            defaultValue={spot.name}
+                            className="w-full px-6 py-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-gray-800/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#D4AF37]/20 focus:border-[#D4AF37] outline-none transition-all font-medium text-sm shadow-inner"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">{t('classification')}</label>
+                        <select
+                            defaultValue="Hidden Gem"
+                            className="w-full px-6 py-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-gray-800/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#D4AF37]/20 focus:border-[#D4AF37] outline-none transition-all font-bold text-sm shadow-inner appearance-none cursor-pointer"
+                        >
+                            <option>Local Artisan</option>
+                            <option>Hyperlocal Food</option>
+                            <option>Hidden Gem</option>
+                            <option>Cultural Experience</option>
+                            <option>Nature</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div>
-                    <h4 className="text-xl font-bold text-gray-900 dark:text-white">{partner?.fullName || "Heritage Partner"}</h4>
-                    <p className="text-sm text-gray-400 font-bold uppercase tracking-widest mt-1.5">{partner?.email || "curator@mysurumarga.com"}</p>
+                    <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">{t('soulfulNarrative')}</label>
+                    <textarea
+                        rows="4"
+                        defaultValue={spot.description}
+                        className="w-full px-6 py-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-gray-800/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#D4AF37]/20 focus:border-[#D4AF37] outline-none transition-all font-medium text-sm shadow-inner resize-none"
+                    ></textarea>
                 </div>
-                <button className="ml-auto bg-black dark:bg-[#D4AF37] text-white dark:text-black px-8 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:scale-105 transition-all">Relocate Photo</button>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="p-8 rounded-3xl bg-white/50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 shadow-sm transition-all hover:shadow-md">
-                    <h4 className="font-bold text-gray-900 dark:text-white text-sm mb-2">Echo Notifications</h4>
-                    <p className="text-xs text-gray-400 font-medium mb-6">Receive spiritual alerts when traveler echoes are recorded.</p>
-                    <div className="w-14 h-7 bg-[#D4AF37] rounded-full relative cursor-pointer ring-4 ring-[#D4AF37]/10">
-                        <div className="absolute right-1 top-1 w-5 h-5 bg-black rounded-full shadow-lg"></div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div>
+                        <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">{t('sacredLocation')}</label>
+                        <div className="relative">
+                            <MapPin className="absolute left-5 top-1/2 -translate-y-1/2 text-[#D4AF37]" size={18} />
+                            <input
+                                type="text"
+                                defaultValue={spot.location}
+                                className="w-full pl-14 pr-6 py-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-gray-800/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#D4AF37]/20 transition-all font-medium text-sm shadow-inner"
+                            />
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">{t('traditionalHours')}</label>
+                        <div className="relative">
+                            <Clock className="absolute left-5 top-1/2 -translate-y-1/2 text-[#D4AF37]" size={18} />
+                            <input
+                                type="text"
+                                defaultValue={spot.openingHours}
+                                className="w-full pl-14 pr-6 py-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-gray-800/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#D4AF37]/20 transition-all font-medium text-sm shadow-inner"
+                            />
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">{t('contactPresence')}</label>
+                        <input
+                            type="text"
+                            placeholder="+91 XXXXX XXXXX"
+                            className="w-full px-6 py-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-gray-800/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#D4AF37]/20 transition-all font-medium text-sm shadow-inner"
+                        />
                     </div>
                 </div>
-                <div className="p-8 rounded-3xl bg-white/50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 shadow-sm transition-all hover:shadow-md">
-                    <h4 className="font-bold text-gray-900 dark:text-white text-sm mb-2">Heritage Visibility</h4>
-                    <p className="text-xs text-gray-400 font-medium mb-6">Toggle your spot's presence in the physical soul of the app.</p>
-                    <div className="w-14 h-7 bg-[#D4AF37] rounded-full relative cursor-pointer ring-4 ring-[#D4AF37]/10">
-                        <div className="absolute right-1 top-1 w-5 h-5 bg-black rounded-full shadow-lg"></div>
+
+                <div className="pt-6">
+                    <button
+                        type="submit"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            showNotification("Heritage records preserved.");
+                        }}
+                        className="bg-black dark:bg-[#D4AF37] text-white dark:text-black px-12 py-5 rounded-2xl font-black shadow-2xl shadow-[#D4AF37]/20 active:scale-95 transition-all text-xs uppercase tracking-[0.2em]"
+                    >
+                        {t('preserveChanges')}
+                    </button>
+                </div>
+            </form>
+        </div>
+    );
+};
+
+export const ReviewsTab = ({ feedbacks }) => {
+    const { t } = useTranslation();
+    return (
+        <div className="space-y-8">
+            <h3 className="text-3xl font-serif text-black dark:text-white mb-4">{t('travelerEchoes')}</h3>
+            <div className="space-y-6">
+                {feedbacks.length === 0 ? (
+                    <div className="py-24 text-center bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl rounded-[2rem] border border-dashed border-gray-200 dark:border-gray-800">
+                        <MessageSquare size={64} className="mx-auto text-gray-200 dark:text-gray-800 mb-6" />
+                        <p className="text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest text-[10px]">{t('noEchoes')}</p>
+                    </div>
+                ) : (
+                    feedbacks.map((feedback, i) => (
+                        <div key={feedback.id} className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl p-8 rounded-[2rem] shadow-xl border border-gray-100 dark:border-gray-800 transition-all hover:translate-x-1 group">
+                            <div className="flex justify-between items-start mb-6">
+                                <div className="flex gap-5">
+                                    <div className="w-14 h-14 rounded-2xl bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] font-black text-xl shadow-inner group-hover:scale-110 transition-transform">
+                                        {feedback.userEmail ? feedback.userEmail.charAt(0).toUpperCase() : 'U'}
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-gray-900 dark:text-white text-sm">{feedback.userEmail || t('anonymousTraveler')}</h4>
+                                        <div className="flex text-[#D4AF37] mt-1.5 gap-0.5">
+                                            {[1, 2, 3, 4, 5].map(star => (
+                                                <Star key={star} size={12} className={star <= feedback.rating ? "fill-current" : "text-gray-300 dark:text-gray-600"} />
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                                    {new Date(feedback.timestamp).toLocaleDateString()}
+                                </span>
+                            </div>
+                            <p className="text-gray-500 dark:text-gray-400 font-medium leading-relaxed text-sm italic">
+                                "{feedback.comment}"
+                            </p>
+                            <button className="mt-6 text-[#D4AF37] font-black text-[10px] uppercase tracking-widest hover:underline flex items-center gap-2">
+                                <MessageSquare size={14} />
+                                <span>{t('acknowledgeThought')}</span>
+                            </button>
+                        </div>
+                    ))
+                )}
+            </div>
+        </div>
+    );
+};
+
+export const PartnerSettingsTab = ({ partner }) => {
+    const { t } = useTranslation();
+    return (
+        <div className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-gray-800 p-12">
+            <h3 className="text-3xl font-serif text-black dark:text-white mb-12">{t('partnerTitle')}</h3>
+            <div className="space-y-12">
+                <div className="flex items-center gap-8 pb-12 border-b border-gray-100 dark:border-gray-800">
+                    <div className="w-24 h-24 rounded-3xl bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] shadow-inner">
+                        <Users size={40} />
+                    </div>
+                    <div>
+                        <h4 className="text-xl font-bold text-gray-900 dark:text-white">{partner?.fullName || "Heritage Partner"}</h4>
+                        <p className="text-sm text-gray-400 font-bold uppercase tracking-widest mt-1.5">{partner?.email || "curator@mysurumarga.com"}</p>
+                    </div>
+                    <button className="ml-auto bg-black dark:bg-[#D4AF37] text-white dark:text-black px-8 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:scale-105 transition-all">Relocate Photo</button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="p-8 rounded-3xl bg-white/50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 shadow-sm transition-all hover:shadow-md col-span-1 md:col-span-2">
+                        <div className="flex items-center gap-4 mb-6">
+                            <div className="p-3 bg-mysore-100 dark:bg-mysore-900/30 rounded-2xl">
+                                <Globe className="h-6 w-6 text-mysore-600" />
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-gray-900 dark:text-white text-sm">{t('language')}</h4>
+                                <p className="text-xs text-gray-400 font-medium tracking-tight">Select your preferred language for the whole platform</p>
+                            </div>
+                        </div>
+                        <LanguageSelector />
+                    </div>
+                    <div className="p-8 rounded-3xl bg-white/50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 shadow-sm transition-all hover:shadow-md">
+                        <h4 className="font-bold text-gray-900 dark:text-white text-sm mb-2">{t('notifications')}</h4>
+                        <p className="text-xs text-gray-400 font-medium mb-6">Receive spiritual alerts when traveler echoes are recorded.</p>
+                        <div className="w-14 h-7 bg-[#D4AF37] rounded-full relative cursor-pointer ring-4 ring-[#D4AF37]/10">
+                            <div className="absolute right-1 top-1 w-5 h-5 bg-black rounded-full shadow-lg"></div>
+                        </div>
+                    </div>
+                    <div className="p-8 rounded-3xl bg-white/50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 shadow-sm transition-all hover:shadow-md">
+                        <h4 className="font-bold text-gray-900 dark:text-white text-sm mb-2">{t('visibility')}</h4>
+                        <p className="text-xs text-gray-400 font-medium mb-6">Toggle your spot's presence in the physical soul of the app.</p>
+                        <div className="w-14 h-7 bg-[#D4AF37] rounded-full relative cursor-pointer ring-4 ring-[#D4AF37]/10">
+                            <div className="absolute right-1 top-1 w-5 h-5 bg-black rounded-full shadow-lg"></div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-);
-
+    );
+};
 
 export const PartnerInvitationsTab = ({ partner, spot, showNotification }) => {
+    const { t } = useTranslation();
     const [invites, setInvites] = useState(() => {
         const stored = localStorage.getItem('collaboration_invites');
         const allInvites = stored ? JSON.parse(stored) : [];
@@ -3814,8 +3842,8 @@ export const PartnerInvitationsTab = ({ partner, spot, showNotification }) => {
         <div className="space-y-10">
             <div className="bg-black dark:bg-[#D4AF37] rounded-[2.5rem] p-12 text-white dark:text-black shadow-2xl relative overflow-hidden group">
                 <div className="relative z-10">
-                    <h3 className="text-3xl font-serif mb-3">Partner with Sovereignty</h3>
-                    <p className="opacity-80 font-medium mb-10 max-w-lg text-sm leading-relaxed">Send a formal collaboration invite to the Heritage Administration to request verification badges, curated placement, or royal features.</p>
+                    <h3 className="text-3xl font-serif mb-3">{t('partnerWithSovereignty')}</h3>
+                    <p className="opacity-80 font-medium mb-10 max-w-lg text-sm leading-relaxed">{t('requestCollaborationDesc')}</p>
                     <button
                         onClick={sendInvite}
                         disabled={isSending}
@@ -3826,11 +3854,11 @@ export const PartnerInvitationsTab = ({ partner, spot, showNotification }) => {
                         ) : (
                             <Send size={20} />
                         )}
-                        <span>{isSending ? 'Transmitting...' : 'Request Heritage Collaboration'}</span>
+                        <span>{isSending ? t('transmitting') : t('requestCollaborationBtn')}</span>
                     </button>
                     {showSuccess && (
                         <div className="mt-6 bg-emerald-500 text-white px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest animate-bounce inline-block shadow-lg">
-                            Invitation Transmitted
+                            {t('invitationTransmitted')}
                         </div>
                     )}
                 </div>
@@ -3839,13 +3867,13 @@ export const PartnerInvitationsTab = ({ partner, spot, showNotification }) => {
 
             <div className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl rounded-[2.5rem] border border-gray-100 dark:border-gray-800 shadow-2xl overflow-hidden">
                 <div className="px-10 py-8 border-b border-gray-100 dark:border-gray-800">
-                    <h3 className="text-2xl font-serif text-black dark:text-white">Request Chronicle</h3>
+                    <h3 className="text-2xl font-serif text-black dark:text-white">{t('requestChronicle')}</h3>
                 </div>
                 <div className="divide-y divide-gray-50 dark:divide-gray-800">
                     {invites.length === 0 ? (
                         <div className="py-24 text-center">
                             <Inbox size={64} className="mx-auto text-gray-200 dark:text-gray-800 mb-6" />
-                            <p className="text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest text-[10px]">No recent requests</p>
+                            <p className="text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest text-[10px]">{t('noRecentRequests')}</p>
                         </div>
                     ) : (
                         invites.map(invite => (
@@ -3855,7 +3883,7 @@ export const PartnerInvitationsTab = ({ partner, spot, showNotification }) => {
                                         <Send size={20} />
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-gray-900 dark:text-white text-sm">Collaboration Protocol</h4>
+                                        <h4 className="font-bold text-gray-900 dark:text-white text-sm">{t('collaborationProtocol')}</h4>
                                         <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1.5 flex items-center gap-2">
                                             <Clock size={12} className="text-[#D4AF37]" />
                                             <span>{new Date(invite.timestamp).toLocaleDateString()} at {new Date(invite.timestamp).toLocaleTimeString()}</span>
@@ -3900,6 +3928,7 @@ export const PartnerStatCard = ({ icon, label, value, trend, bgColor, onClick })
 
 
 export const EventsTab = ({ partner, spot, setConfirmModal, showNotification }) => {
+    const { t } = useTranslation();
     const [events, setEvents] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
@@ -3911,6 +3940,7 @@ export const EventsTab = ({ partner, spot, setConfirmModal, showNotification }) 
         type: 'Festival',
         price: 'Free'
     });
+
 
     React.useEffect(() => {
         loadEvents();
@@ -4003,13 +4033,13 @@ export const EventsTab = ({ partner, spot, setConfirmModal, showNotification }) 
     return (
         <div className="space-y-10">
             <div className="flex justify-between items-center">
-                <h3 className="text-3xl font-serif text-black dark:text-white">Heritage Chronicles</h3>
+                <h3 className="text-3xl font-serif text-black dark:text-white">{t('heritageEventsOffers')}</h3>
                 <button
                     onClick={() => setShowForm(!showForm)}
                     className="bg-black dark:bg-[#D4AF37] text-white dark:text-black px-8 py-4 rounded-2xl font-black flex items-center gap-3 hover:scale-105 transition-all shadow-xl text-xs uppercase tracking-widest"
                 >
                     {showForm ? <Inbox size={18} /> : <Plus size={18} />}
-                    <span>{showForm ? 'View Events' : 'Promote Event'}</span>
+                    <span>{showForm ? 'View Events' : t('designEventBtn')}</span>
                 </button>
             </div>
 
