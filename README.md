@@ -11,7 +11,7 @@ A premium, state-of-the-art web application dedicated to exploring the rich heri
   <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
   <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind" />
   <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase" />
-  <img src="https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white" alt="OpenAI" />
+
   <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript" />
   <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5" />
   <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" alt="CSS3" />
@@ -33,7 +33,7 @@ The project follows a clean separation of concerns between the client-side exper
 │
 ├── server/                 # Backend (Vercel Serverless)
 │   └── api/                # API Endpoints
-│       └── chat.js         # AI Heritage Guide (OpenAI)
+
 │
 └── package.json            # Root configuration & scripts
 ```
@@ -44,7 +44,7 @@ The project follows a clean separation of concerns between the client-side exper
 
 - Node.js (v18+)
 - Supabase Project (for live heritage data)
-- OpenAI API Key (for the AI Guide)
+
 
 ### Installation
 
@@ -68,13 +68,12 @@ npm run dev
 - **Unified Heritage Engine**: All components and pages are consolidated for lightning-fast performance and easier maintenance.
 - **Sovereign Dark Mode**: A custom-crafted dark theme inspired by the royalty of Mysuru.
 - **Interactive Heritage Map**: Real-time spatial exploration of monuments and hidden spots.
-- **AI Heritage Guide**: Personalized recommendations and history via a secure backend proxy.
+- **AI Heritage Guide**: Interactive chat interface providing heritage information.
 - **Partner Dashboard**: A dedicated interface for local business owners to manage their spots and events.
 - **Admin Command Center**: Complete oversight of users, invitations, and system security.
 
 ## Security
 
-- **Backend Proxying**: All sensitive API calls (like OpenAI) are handled via server-side functions to protect private keys.
 - **Supabase Auth**: Secure authentication and identity management.
 - **Input Sanitization**: Using DOMPurify to protect against XSS in dynamic traveler echoes.
 
