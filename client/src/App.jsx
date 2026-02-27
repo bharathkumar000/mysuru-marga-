@@ -406,7 +406,12 @@ export const EventsSection = ({ events = [] }) => {
 export const Explore = ({ places, onCardClick, savedPlaceIds = [], onToggleSave, selectedCategory, onCategoryClick }) => {
     const [searchQuery, setSearchQuery] = useState('');
 
+    const featuredIds = featuredPlaces.map(p => p.id);
+
     const filteredPlaces = places.filter(place => {
+        // Exclude featured spots from Explore page
+        if (featuredIds.includes(place.id)) return false;
+
         const matchesSearch = place.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             place.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
             place.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -4484,7 +4489,7 @@ export const featuredPlaces = [
         location: "City Center",
         rating: 4.9,
         coords: [12.3051, 76.6551],
-        image: "https://images.unsplash.com/photo-1582298538104-fe2e74c27f59?auto=format&fit=crop&q=80&w=1000"
+        image: "/palace-dasara.webp"
     },
     {
         id: 'kr-circle-dasara',
@@ -4495,18 +4500,7 @@ export const featuredPlaces = [
         location: "K.R. Circle",
         rating: 4.8,
         coords: [12.3051, 76.6551],
-        image: "https://images.unsplash.com/photo-1616422335193-4a0d92375537?auto=format&fit=crop&q=80&w=1000"
-    },
-    {
-        id: 'chamundi-night',
-        title: "Chamundi Hill Night View",
-        category: "Scenic",
-        categoryColor: "bg-blue-600",
-        description: "Witness the 'City of Lights' from 3,489 feet, where Mysore resembles a glowing carpet of gold.",
-        location: "Hill Top Viewpoint",
-        rating: 4.8,
-        coords: [12.2753, 76.6701],
-        image: "/chamundi.png"
+        image: "/kr-circle-night.webp"
     },
     {
         id: 'philomena-night',
@@ -4517,7 +4511,7 @@ export const featuredPlaces = [
         location: "Ashoka Road",
         rating: 4.7,
         coords: [12.3209, 76.6593],
-        image: "/philomena.png"
+        image: "/gallery3.webp"
     }
 ];
 
@@ -4696,7 +4690,7 @@ export const popularPlaces = [
         location: "Chamundi Hills",
         rating: 4.9,
         coords: [12.2753, 76.6701],
-        image: "https://images.unsplash.com/photo-1551632432-c735eef10bc1?auto=format&fit=crop&q=80&w=1000"
+        image: "/chamundi-trek.webp"
     },
     {
         id: 'varuna-lake',
@@ -4718,7 +4712,7 @@ export const popularPlaces = [
         location: "KRS Road (8km)",
         rating: 4.6,
         coords: [12.3524, 76.6214],
-        image: "https://images.unsplash.com/photo-1513889961551-6ad87a513c7a?auto=format&fit=crop&q=80&w=1000"
+        image: "/grs-park.webp"
     },
     {
         id: 'kunti-betta',
@@ -5148,17 +5142,6 @@ function App() {
                 return (
                     <>
                         <Hero onExploreClick={() => setActiveTab('explore')} />
-                        <Categories
-                            onSeeAllClick={() => {
-                                setSelectedCategory(null);
-                                setActiveTab('explore');
-                            }}
-                            onCategoryClick={(category) => {
-                                setSelectedCategory(category);
-                                setActiveTab('explore');
-                            }}
-                            selectedCategory={selectedCategory}
-                        />
                         <FeaturedSection
                             places={spots.slice(0, 4)}
                             onCardClick={handleFeaturedCardClick}
