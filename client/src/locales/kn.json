@@ -60,5 +60,17 @@
     "heritageEventsOffers": "ಪರಂಪರೆಯ ಕಾರ್ಯಕ್ರಮಗಳು ಮತ್ತು ಕೊಡುಗೆಗಳು",
     "designEventDesc": "ಸಮುದಾಯಕ್ಕಾಗಿ ವಿಶೇಷ ಅನುಭವಗಳು, ಕಾರ್ಯಾಗಾರಗಳು ಅಥವಾ ಸಾಂಪ್ರದಾಯಿಕ ಸಭೆಗಳನ್ನು ವಿನ್ಯಾಸಗೊಳಿಸಿ.",
     "designEventBtn": "ಈವೆಂಟ್ ವಿನ್ಯಾಸಗೊಳಿಸಿ",
-    "noActiveEvents": "ಯಾವುದೇ ಸಕ್ರಿಯ ಘಟನೆಗಳು ಅಥವಾ ಕೊಡುಗೆಗಳಿಲ್ಲ"
+    "noActiveEvents": "ಯಾವುದೇ ಸಕ್ರಿಯ ಘಟನೆಗಳು ಅಥವಾ ಕೊಡುಗೆಗಳಿಲ್ಲ",
+    "profileTitle": "ಪ್ರೊಫೈಲ್",
+    "guestUser": "ಅತಿಥಿ ಬಳಕೆದಾರ",
+    "noEmailProvided": "ಯಾವುದೇ ಇಮೇಲ್ ಒದಗಿಸಲಾಗಿಲ್ಲ",
+    "privacySettings": "ಗೌಪ್ಯತೆ ಸೆಟ್ಟಿಂಗ್‌ಗಳು",
+    "wishlist": "ಬಯಕೆಪಟ್ಟಿ",
+    "helpSupport": "ಸಹಾಯ ಮತ್ತು ಬೆಂಬಲ",
+    "aboutApp": "ಅಪ್ಲಿಕೇಶನ್ ಬಗ್ಗೆ",
+    "shareFeedback": "ಪ್ರತಿಕ್ರಿಯೆ ಹಂಚಿಕೊಳ್ಳಿ",
+    "darkMode": "ಡಾರ್ಕ್ ಮೋಡ್",
+    "locationServices": "ಸ್ಥಳ ಸೇವೆಗಳು",
+    "version": "ಆವೃತ್ತಿ",
+    "premiumTab": "ಪ್ರೀಮಿಯಂ"
 }

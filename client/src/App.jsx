@@ -4462,61 +4462,65 @@ export const ProfilePage = ({ onBack, isDarkMode, onToggleDarkMode, onLogout, us
     );
 };
 
-export const MainProfileView = ({ onBack, onNavigate, onLogout, userData }) => (
-    <>
-        {/* Header */}
-        <div className="bg-white dark:bg-gray-900 px-4 py-4 flex items-center shadow-sm sticky top-0 z-10 border-b dark:border-gray-800 transition-colors duration-200">
-            <button onClick={onBack} className="mr-4 text-gray-600 dark:text-gray-300">
-                <ArrowLeft className="w-6 h-6" />
-            </button>
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">Profile</h1>
-        </div>
-
-        {/* User Info */}
-        <div className="bg-white dark:bg-gray-900 mt-4 px-4 py-6 flex items-center transition-colors duration-200">
-            <div className="w-16 h-16 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center text-orange-600 dark:text-orange-500 mb-0 mr-4 font-bold text-2xl">
-                {(userData?.fullName || userData?.full_name || 'G').charAt(0).toUpperCase()}
+export const MainProfileView = ({ onBack, onNavigate, onLogout, userData }) => {
+    const { t } = useTranslation();
+    return (
+        <>
+            {/* Header */}
+            <div className="bg-white dark:bg-gray-900 px-4 py-4 flex items-center shadow-sm sticky top-0 z-10 border-b dark:border-gray-800 transition-colors duration-200">
+                <button onClick={onBack} className="mr-4 text-gray-600 dark:text-gray-300">
+                    <ArrowLeft className="w-6 h-6" />
+                </button>
+                <h1 className="text-xl font-bold text-gray-900 dark:text-white">{t('profileTitle')}</h1>
             </div>
-            <div>
-                <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-                    {userData?.fullName || userData?.full_name || 'Guest User'}
-                </h2>
-                <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm mt-1">
-                    <Mail className="w-3.5 h-3.5 mr-1.5" />
-                    <span>{userData?.email || 'No email provided'}</span>
+
+            {/* User Info */}
+            <div className="bg-white dark:bg-gray-900 mt-4 px-4 py-6 flex items-center transition-colors duration-200">
+                <div className="w-16 h-16 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center text-orange-600 dark:text-orange-500 mb-0 mr-4 font-bold text-2xl">
+                    {(userData?.fullName || userData?.full_name || 'G').charAt(0).toUpperCase()}
                 </div>
-                {userData?.phone && (
+                <div>
+                    <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+                        {userData?.fullName || userData?.full_name || t('guestUser')}
+                    </h2>
                     <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm mt-1">
-                        <Phone className="w-3.5 h-3.5 mr-1.5" />
-                        <span>{userData?.phone}</span>
+                        <Mail className="w-3.5 h-3.5 mr-1.5" />
+                        <span>{userData?.email || t('noEmailProvided')}</span>
                     </div>
-                )}
+                    {userData?.phone && (
+                        <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm mt-1">
+                            <Phone className="w-3.5 h-3.5 mr-1.5" />
+                            <span>{userData?.phone}</span>
+                        </div>
+                    )}
+                </div>
             </div>
-        </div>
 
-        {/* Menu Options */}
-        <div className="mt-6 bg-white dark:bg-gray-900 transition-colors duration-200">
-            <MenuItem icon={Settings} label="Settings" onClick={() => onNavigate('settings')} />
-            <MenuItem icon={Shield} label="Privacy Settings" onClick={() => onNavigate('privacy')} />
-            <MenuItem icon={Heart} label="Wishlist" onClick={() => onNavigate('wishlist')} />
-            <MenuItem icon={HelpCircle} label="Help & Support" onClick={() => onNavigate('help')} />
-            <MenuItem icon={Info} label="About App" onClick={() => onNavigate('about')} />
-            <MenuItem icon={MessageSquare} label="Share Feedback" onClick={() => onNavigate('feedback')} />
-        </div>
+            {/* Menu Options */}
+            <div className="mt-6 bg-white dark:bg-gray-900 transition-colors duration-200">
+                <MenuItem icon={Settings} label={t('settingsTab')} onClick={() => onNavigate('settings')} />
+                <MenuItem icon={Shield} label={t('privacySettings')} onClick={() => onNavigate('privacy')} />
+                <MenuItem icon={Heart} label={t('wishlist')} onClick={() => onNavigate('wishlist')} />
+                <MenuItem icon={HelpCircle} label={t('helpSupport')} onClick={() => onNavigate('help')} />
+                <MenuItem icon={Info} label={t('aboutApp')} onClick={() => onNavigate('about')} />
+                <MenuItem icon={MessageSquare} label={t('shareFeedback')} onClick={() => onNavigate('feedback')} />
+            </div>
 
-        <div className="px-4 mt-8">
-            <button
-                onClick={onLogout}
-                className="w-full py-3 text-red-500 font-medium bg-white dark:bg-gray-800 rounded-lg border border-red-100 dark:border-red-900/30 shadow-sm hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-            >
-                Log Out
-            </button>
-            <p className="text-center text-xs text-gray-400 dark:text-gray-600 mt-4">Version 1.0.0</p>
-        </div>
-    </>
-);
+            <div className="px-4 mt-8">
+                <button
+                    onClick={onLogout}
+                    className="w-full py-3 text-red-500 font-medium bg-white dark:bg-gray-800 rounded-lg border border-red-100 dark:border-red-900/30 shadow-sm hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                >
+                    {t('logout')}
+                </button>
+                <p className="text-center text-xs text-gray-400 dark:text-gray-600 mt-4">{t('version')} 1.0.0</p>
+            </div>
+        </>
+    );
+};
 
 export const SettingsView = ({ onBack, isDarkMode, onToggleDarkMode, onUpdateProfile, userData }) => {
+    const { t, i18n } = useTranslation();
 
     const handleToggle = (key, value) => {
         if (onUpdateProfile) {
@@ -4524,36 +4528,61 @@ export const SettingsView = ({ onBack, isDarkMode, onToggleDarkMode, onUpdatePro
         }
     };
 
+    const handleLanguageChange = (e) => {
+        i18n.changeLanguage(e.target.value);
+    };
+
     return (
         <>
-            <SubViewHeader title="Settings" onBack={onBack} />
+            <SubViewHeader title={t('settings')} onBack={onBack} />
             <div className="mt-4 bg-white dark:bg-gray-900 transition-colors duration-200">
                 <ToggleItem
                     icon={Bell}
-                    label="Notifications"
+                    label={t('notifications')}
                     checked={userData?.notifications !== false}
                     onToggle={() => handleToggle('notifications', !userData?.notifications)}
                 />
                 <ToggleItem
                     icon={Moon}
-                    label="Dark Mode"
+                    label={t('darkMode')}
                     checked={isDarkMode}
                     onToggle={onToggleDarkMode}
                 />
                 <ToggleItem
                     icon={MapPin}
-                    label="Location Services"
+                    label={t('locationServices')}
                     checked={userData?.locationServices !== false}
                     onToggle={() => handleToggle('locationServices', !userData?.locationServices)}
                 />
                 <div className="h-px bg-gray-50 dark:bg-gray-800 my-2"></div>
-                <MenuItem icon={Globe} label="Language" value="English" />
+                <div className="flex items-center justify-between px-4 py-3 active:bg-gray-50 dark:active:bg-gray-800 transition-colors">
+                    <div className="flex flex-col gap-1">
+                        <div className="flex items-center text-gray-900 dark:text-white">
+                            <Globe className="w-5 h-5 mr-3 text-gray-400 dark:text-gray-500" />
+                            <span className="font-medium">{t('systemLanguageTitle')}</span>
+                        </div>
+                    </div>
+                    <select
+                        className="bg-gray-100 dark:bg-gray-800 border-none text-sm rounded-lg px-2 py-1 text-gray-700 dark:text-gray-300 outline-none"
+                        value={i18n.language || 'en'}
+                        onChange={handleLanguageChange}
+                    >
+                        <option value="en">English</option>
+                        <option value="kn">ಕನ್ನಡ</option>
+                        <option value="hi">हिंदी</option>
+                        <option value="ta">தமிழ்</option>
+                        <option value="te">తెలుగు</option>
+                        <option value="es">Español</option>
+                        <option value="fr">Français</option>
+                    </select>
+                </div>
             </div>
         </>
     );
 };
 
 export const PrivacyView = ({ onBack, onUpdateProfile, userData }) => {
+    const { t } = useTranslation();
     const handleToggle = (key, value) => {
         if (onUpdateProfile) {
             onUpdateProfile({ [key]: value });
@@ -4562,7 +4591,7 @@ export const PrivacyView = ({ onBack, onUpdateProfile, userData }) => {
 
     return (
         <>
-            <SubViewHeader title="Privacy Settings" onBack={onBack} />
+            <SubViewHeader title={t('privacySettings')} onBack={onBack} />
             <div className="mt-4 bg-white dark:bg-gray-900 transition-colors duration-200">
                 <ToggleItem
                     icon={Lock}
@@ -4585,11 +4614,12 @@ export const PrivacyView = ({ onBack, onUpdateProfile, userData }) => {
 };
 
 export const WishlistView = ({ onBack, savedPlaceIds, allPlaces }) => {
+    const { t } = useTranslation();
     const savedPlaces = allPlaces ? allPlaces.filter(p => savedPlaceIds && savedPlaceIds.includes(p.id)) : [];
 
     return (
         <>
-            <SubViewHeader title="Wishlist" onBack={onBack} />
+            <SubViewHeader title={t('wishlist')} onBack={onBack} />
             {savedPlaces.length === 0 ? (
                 <div className="flex flex-col items-center justify-center p-8 text-center mt-10">
                     <div className="w-16 h-16 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center mb-4">
@@ -4613,45 +4643,54 @@ export const WishlistView = ({ onBack, savedPlaceIds, allPlaces }) => {
     );
 };
 
-export const HelpView = ({ onBack }) => (
-    <>
-        <SubViewHeader title="Help & Support" onBack={onBack} />
-        <div className="mt-4 bg-white dark:bg-gray-900 transition-colors duration-200">
-            <MenuItem icon={HelpCircle} label="FAQs" />
-            <MenuItem icon={Phone} label="Contact Support" />
-            <MenuItem icon={ExternalLink} label="Visit Website" />
-        </div>
-    </>
-);
-
-export const AboutView = ({ onBack }) => (
-    <>
-        <SubViewHeader title="About App" onBack={onBack} />
-        <div className="p-6 text-center">
-            <div className="w-20 h-20 bg-orange-500 rounded-2xl mx-auto flex items-center justify-center mb-6 shadow-lg shadow-orange-200 dark:shadow-none">
-                <h1 className="text-3xl font-bold text-white">M</h1>
+export const HelpView = ({ onBack }) => {
+    const { t } = useTranslation();
+    return (
+        <>
+            <SubViewHeader title={t('helpSupport')} onBack={onBack} />
+            <div className="mt-4 bg-white dark:bg-gray-900 transition-colors duration-200">
+                <MenuItem icon={HelpCircle} label="FAQs" />
+                <MenuItem icon={Phone} label="Contact Support" />
+                <MenuItem icon={ExternalLink} label="Visit Website" />
             </div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Mysuru Marga</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Version 1.0.0</p>
-            <p className="text-gray-600 dark:text-gray-300 mt-6 text-sm leading-relaxed">
-                Mysuru Marga is your digital companion for exploring the heritage city of Mysore.
-                Discover hidden gems, local artisans, and authentic culinary experiences curated just for you.
-            </p>
-            <div className="mt-8 text-xs text-gray-400 dark:text-gray-600">
-                © 2025 Mysuru Marga. All rights reserved.
-            </div>
-        </div>
-    </>
-);
+        </>
+    );
+};
 
-export const FeedbackView = ({ onBack, userData }) => (
-    <>
-        <SubViewHeader title="Feedback" onBack={onBack} />
-        <div className="p-4">
-            <FeedbackSection userEmail={userData?.email || 'Anonymous'} />
-        </div>
-    </>
-);
+export const AboutView = ({ onBack }) => {
+    const { t } = useTranslation();
+    return (
+        <>
+            <SubViewHeader title={t('aboutApp')} onBack={onBack} />
+            <div className="p-6 text-center">
+                <div className="w-20 h-20 bg-orange-500 rounded-2xl mx-auto flex items-center justify-center mb-6 shadow-lg shadow-orange-200 dark:shadow-none">
+                    <h1 className="text-3xl font-bold text-white">M</h1>
+                </div>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">Mysuru Marga</h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Version 1.0.0</p>
+                <p className="text-gray-600 dark:text-gray-300 mt-6 text-sm leading-relaxed">
+                    Mysuru Marga is your digital companion for exploring the heritage city of Mysore.
+                    Discover hidden gems, local artisans, and authentic culinary experiences curated just for you.
+                </p>
+                <div className="mt-8 text-xs text-gray-400 dark:text-gray-600">
+                    © 2025 Mysuru Marga. All rights reserved.
+                </div>
+            </div>
+        </>
+    );
+};
+
+export const FeedbackView = ({ onBack, userData }) => {
+    const { t } = useTranslation();
+    return (
+        <>
+            <SubViewHeader title={t('shareFeedback')} onBack={onBack} />
+            <div className="p-4">
+                <FeedbackSection userEmail={userData?.email || 'Anonymous'} />
+            </div>
+        </>
+    );
+};
 
 // Helper Components
 
