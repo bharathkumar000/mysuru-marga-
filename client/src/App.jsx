@@ -3550,6 +3550,22 @@ export const PartnerOverviewTab = ({ spot, setActiveTab, feedbacks }) => {
 
 export const ManageSpotTab = ({ spot }) => {
     const { t } = useTranslation();
+    const [products, setProducts] = useState(spot.products || []);
+    const [showProductModal, setShowProductModal] = useState(false);
+    const [newProduct, setNewProduct] = useState({ description: '', image: '', priceRange: '' });
+
+    const handleAddProduct = () => {
+        if (newProduct.description && newProduct.priceRange) {
+            setProducts([...products, { ...newProduct, id: Date.now() }]);
+            setNewProduct({ description: '', image: '', priceRange: '' });
+            setShowProductModal(false);
+        }
+    };
+
+    const handleRemoveProduct = (id) => {
+        setProducts(products.filter(p => p.id !== id));
+    };
+
     return (
         <div className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden px-10 py-12">
             <h3 className="text-3xl font-serif text-black dark:text-white mb-10">{t('curationDetails')}</h3>
@@ -3563,18 +3579,52 @@ export const ManageSpotTab = ({ spot }) => {
                             className="w-full px-6 py-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-gray-800/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#D4AF37]/20 focus:border-[#D4AF37] outline-none transition-all font-medium text-sm shadow-inner"
                         />
                     </div>
-                    <div>
-                        <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">{t('classification')}</label>
-                        <select
-                            defaultValue="Hidden Gem"
-                            className="w-full px-6 py-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-gray-800/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#D4AF37]/20 focus:border-[#D4AF37] outline-none transition-all font-bold text-sm shadow-inner appearance-none cursor-pointer"
-                        >
-                            <option>Local Artisan</option>
-                            <option>Hyperlocal Food</option>
-                            <option>Hidden Gem</option>
-                            <option>Cultural Experience</option>
-                            <option>Nature</option>
-                        </select>
+                    <div className="space-y-6">
+                        <div className="flex items-center justify-between">
+                            <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400">Products</label>
+                            <button
+                                type="button"
+                                onClick={() => setShowProductModal(true)}
+                                className="bg-black dark:bg-[#D4AF37] text-white dark:text-black px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md transition-transform hover:scale-105"
+                            >
+                                + Add Product
+                            </button>
+                        </div>
+                        {products.length > 0 && (
+                            <div className="space-y-3 mb-6">
+                                {products.map(prod => (
+                                    <div key={prod.id} className="flex items-center justify-between bg-white/50 dark:bg-gray-800/50 p-4 rounded-2xl border border-gray-100 dark:border-gray-700">
+                                        <div className="flex items-center gap-4">
+                                            {prod.image && <img src={prod.image} alt="Product" className="w-10 h-10 object-cover rounded-lg" />}
+                                            <div>
+                                                <p className="text-xs font-bold text-gray-900 dark:text-white">{prod.description}</p>
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-[#D4AF37]">{prod.priceRange}</p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveProduct(prod.id)}
+                                            className="text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 p-2 rounded-xl transition-colors"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        <div>
+                            <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">{t('classification')}</label>
+                            <select
+                                defaultValue="Hidden Gem"
+                                className="w-full px-6 py-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-gray-800/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#D4AF37]/20 focus:border-[#D4AF37] outline-none transition-all font-bold text-sm shadow-inner appearance-none cursor-pointer"
+                            >
+                                <option>Local Artisan</option>
+                                <option>Hyperlocal Food</option>
+                                <option>Hidden Gem</option>
+                                <option>Cultural Experience</option>
+                                <option>Nature</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -3633,6 +3683,63 @@ export const ManageSpotTab = ({ spot }) => {
                     </button>
                 </div>
             </form>
+
+            {/* Product Modal */}
+            {showProductModal && (
+                <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 sm:p-0">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in duration-300" onClick={() => setShowProductModal(false)}></div>
+                    <div className="bg-white dark:bg-gray-900 rounded-[2rem] shadow-2xl border border-gray-100 dark:border-gray-800 w-full max-w-md relative z-10 p-8 sm:p-10 animate-in zoom-in-95 duration-300">
+                        <h3 className="text-2xl font-serif text-black dark:text-white mb-6">Add Product</h3>
+                        <div className="space-y-5">
+                            <div>
+                                <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Description</label>
+                                <input
+                                    type="text"
+                                    value={newProduct.description}
+                                    onChange={(e) => setNewProduct({...newProduct, description: e.target.value})}
+                                    placeholder="Product description (e.g. Handmade Silk Saree)"
+                                    className="w-full px-5 py-3 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#D4AF37]/20 outline-none text-sm"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Image URL (Optional)</label>
+                                <input
+                                    type="text"
+                                    value={newProduct.image}
+                                    onChange={(e) => setNewProduct({...newProduct, image: e.target.value})}
+                                    placeholder="https://example.com/image.png"
+                                    className="w-full px-5 py-3 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#D4AF37]/20 outline-none text-sm"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Price Range</label>
+                                <input
+                                    type="text"
+                                    value={newProduct.priceRange}
+                                    onChange={(e) => setNewProduct({...newProduct, priceRange: e.target.value})}
+                                    placeholder="e.g. ₹500 - ₹2000"
+                                    className="w-full px-5 py-3 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#D4AF37]/20 outline-none text-sm"
+                                />
+                            </div>
+                        </div>
+                        <div className="flex gap-3 mt-8">
+                            <button
+                                onClick={() => setShowProductModal(false)}
+                                className="flex-1 py-4 text-gray-400 font-black text-[10px] uppercase tracking-widest hover:text-black dark:hover:text-white transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleAddProduct}
+                                disabled={!newProduct.description || !newProduct.priceRange}
+                                className="flex-1 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-black dark:bg-[#D4AF37] text-white dark:text-black shadow-xl disabled:opacity-50 transition-all hover:scale-105 active:scale-95"
+                            >
+                                Add
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
