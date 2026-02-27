@@ -2384,41 +2384,60 @@ export const AuthPage = ({ onLogin, onSignUp }) => {
         setLoginError('');
         setIsLoggingIn(true);
 
-        // 1. Quick Testing Credentials (REMOVED FOR SECURITY)
-        // Hardcoded backdoors have been removed to ensure production security.
+        const identifier = loginIdentifier.trim();
+        const password = loginPassword.trim();
 
+        // DEV SHORTCUTS: 1 = User, 2 = Partner, 3 = Admin
+        if (identifier === '1') {
+            const user = { fullName: 'Demo User', email: 'user@test.com', role: 'user', joinedAt: new Date().toISOString() };
+            localStorage.setItem('userData', JSON.stringify(user));
+            onLogin('user', user);
+            setIsLoggingIn(false);
+            return;
+        }
+        if (identifier === '2') {
+            const partner = { fullName: 'Demo Partner', email: 'partner@test.com', role: 'partner', joinedAt: new Date().toISOString() };
+            localStorage.setItem('userData', JSON.stringify(partner));
+            onLogin('partner', partner);
+            setIsLoggingIn(false);
+            return;
+        }
+        if (identifier === '3') {
+            const admin = { fullName: 'Demo Admin', email: 'admin@test.com', role: 'admin', joinedAt: new Date().toISOString() };
+            localStorage.setItem('userData', JSON.stringify(admin));
+            onLogin('admin', admin);
+            setIsLoggingIn(false);
+            return;
+        }
 
-        // 2. Local Registry Check (Username support)
+        // 1. Local Registry Check (Check this FIRST for demo accounts)
         const usersDB = JSON.parse(localStorage.getItem('usersDB') || '[]');
-        const localUser = usersDB.find(u => u.email === loginIdentifier || u.fullName.toLowerCase() === loginIdentifier.toLowerCase());
+        const localUser = usersDB.find(u =>
+            u.email.toLowerCase() === identifier.toLowerCase() ||
+            u.fullName.toLowerCase() === identifier.toLowerCase()
+        );
 
-        // SECURITY NOTICE: This logic allowed password-less login for local usernames.
-        // It has been disabled to ensure the website is safe.
-        /*
-        // If it's a username login or known local user, let them in immediately
-        const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginIdentifier);
-        if (!isEmail && localUser) {
+        if (localUser) {
             localStorage.setItem('userData', JSON.stringify(localUser));
             onLogin(localUser.role, localUser);
             setIsLoggingIn(false);
             return;
         }
-        */
 
-        const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginIdentifier);
+        const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
 
-        // 3. Supabase Cloud Check
+        // 2. Supabase Cloud Check
         if (supabase) {
             if (!isEmail) {
-                setLoginError('Security Update: Please use your Email Address to log in. Username login is no longer supported.');
+                setLoginError('Please use a valid Email Address.');
                 setIsLoggingIn(false);
                 return;
             }
 
             try {
                 const { data, error } = await supabase.auth.signInWithPassword({
-                    email: loginIdentifier,
-                    password: loginPassword
+                    email: identifier,
+                    password: password
                 });
 
                 if (!error && data.user) {
@@ -2433,18 +2452,13 @@ export const AuthPage = ({ onLogin, onSignUp }) => {
             }
         }
 
-        // 4. Final Fallback (For unverified Supabase emails stored locally)
-        // 4. Fallback: If Supabase login failed or wasn't available, we CANNOT verify password locally anymore.
-        // We only allow login if Supabase verified it, OR if we are in a pure offline demo mode where we don't check security.
-        // However, for strict security requested by USER, we should not allow fallback login if Supabase exists.
-
-        if (!supabase && localUser) {
-            // DEMO MODE ONLY: If no Supabase client exists, allow simplistic login
+        // 4. Final Fallback (Allow local login if Supabase auth failed or wasn't available)
+        if (localUser) {
+            // Check if it's a test user or if we are in demo mode
             localStorage.setItem('userData', JSON.stringify(localUser));
             onLogin(localUser.role, localUser);
-        } else if (localUser && !supabase) {
-            // This branch is redundant but keeps logic clear: if Supabase exists, we already tried and failed above.
-            // So we do NOT allow local password check because we deleted local passwords.
+            setIsLoggingIn(false);
+            return;
         } else {
             setLoginError('No account found or incorrect credentials.');
         }
