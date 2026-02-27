@@ -35,6 +35,22 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY || "AIzaSyBWchuIcpM92mKBushI79JVPhe4A7EQtA4";
 const genAI = new GoogleGenerativeAI(geminiApiKey);
 
+export const LanguageSelector = () => {
+    const { i18n } = useTranslation();
+
+    return (
+        <select
+            className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white text-sm rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/50 appearance-none font-bold cursor-pointer transition-all"
+            value={i18n.language}
+            onChange={(e) => i18n.changeLanguage(e.target.value)}
+        >
+            <option value="en">English (Global)</option>
+            <option value="hi">हिंदी (Hindi)</option>
+            <option value="kn">ಕನ್ನಡ (Kannada)</option>
+        </select>
+    );
+};
+
 export const ChatBot = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([
@@ -1183,7 +1199,8 @@ export const Navbar = ({ onProfileClick, activeTab, setActiveTab }) => {
             </div>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-2 bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl p-1.5 rounded-full border border-gray-200 dark:border-gray-800 shadow-sm">
+            <div className="hidden md:flex items-center gap-1 bg-white/70 dark:bg-gray-800/70 backdrop-blur-3xl p-1.5 rounded-full border border-gray-100 dark:border-gray-700 shadow-sm relative z-50 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/5 via-transparent to-[#D4AF37]/5 pointer-events-none"></div>
                 <NavLink id="home" icon={Home} label="Home" />
                 <NavLink id="explore" icon={Compass} label="Explore" />
                 <NavLink id="MapComponent" icon={MapIcon} label="Map" />
@@ -3349,16 +3366,16 @@ export const PartnerDashboard = ({ onLogout, partnerData }) => {
 
     // Mock data for the partner's spot with dynamic reviews/rating
     const spotData = {
-        name: partnerData?.spotName || "Karanji Lake",
-        category: partnerData?.category || "Nature",
+        name: partnerData?.spotName || "",
+        category: partnerData?.category || "",
         rating: realAvgRating,
         reviewsCount: realReviewsCount,
-        totalVisits: 842 + realReviewsCount, // Added real reviews to visit count for demo
+        totalVisits: realReviewsCount, // Dynamic based on reviews
         status: "Online",
-        images: ["/api/placeholder/400/300", "/api/placeholder/400/300"],
-        description: "Serene nature trail with butterfly park and panoramic palace views. A pristine sanctuary in the heart of Mysore.",
-        openingHours: "6:00 AM - 8:00 PM",
-        location: "Siddhartha Layout, Mysuru"
+        images: [],
+        description: "",
+        openingHours: "",
+        location: ""
     };
 
     const showNotification = (message, type = 'success') => {
@@ -5500,11 +5517,10 @@ function App() {
                 return null;
         }
     };
-
     return (
-        <div className="h-screen w-screen overflow-hidden bg-mysore-light dark:bg-mysore-dark transition-colors duration-200 selection:bg-[#D4AF37]/30 flex flex-col fixed inset-0">
+        <div className="min-h-screen w-full bg-mysore-light dark:bg-mysore-dark transition-colors duration-200 selection:bg-[#D4AF37]/30 flex flex-col relative pb-24 md:pb-0">
             {activeTab !== 'profile' && activeTab !== 'details' && (
-                <div className="sticky top-0 z-40 bg-mysore-light/80 dark:bg-mysore-dark/80 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800 pt-[env(safe-area-inset-top)]">
+                <div className="sticky top-0 z-40 bg-mysore-light/80 dark:bg-mysore-dark/80 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800 pt-[env(safe-area-inset-top)] pb-2 shadow-sm">
                     <div className="max-w-7xl mx-auto w-full">
                         <Navbar
                             onProfileClick={() => setActiveTab('profile')}
@@ -5518,21 +5534,23 @@ function App() {
                 </div>
             )}
 
-            <div className={`flex-1 relative ${activeTab !== 'MapComponent' && activeTab !== 'details' ? 'overflow-y-auto pb-24 md:pb-0 custom-scrollbar' : 'overflow-hidden'}`}>
+            <div className={`flex-1 w-full ${activeTab === 'MapComponent' || activeTab === 'details' ? 'h-full flex flex-col' : ''}`}>
                 <div className="max-w-7xl mx-auto w-full h-full">
                     {renderContent()}
                 </div>
             </div>
 
             {activeTab !== 'profile' && activeTab !== 'details' && (
-                <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 pb-[env(safe-area-inset-bottom)] bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-t border-gray-100 dark:border-gray-800">
+                <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 pb-[env(safe-area-inset-bottom)] bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800 shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
                     <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
                 </div>
             )}
 
             {/* Premium Heritage Guide ChatBot */}
             {isAuthenticated && userRole === 'user' && activeTab !== 'profile' && activeTab !== 'details' && activeTab !== 'planner' && (
-                <ChatBot />
+                <div className="fixed bottom-6 right-6 z-50 pointer-events-none md:pointer-events-auto mix-blend-normal hidden md:block">
+                    <ChatBot />
+                </div>
             )}
         </div>
     );
