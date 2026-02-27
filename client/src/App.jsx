@@ -3373,6 +3373,8 @@ export const PartnerDashboard = ({ onLogout, partnerData }) => {
                 return <PartnerInvitationsTab partner={partnerData} spot={spotData} showNotification={showNotification} />;
             case 'events':
                 return <EventsTab partner={partnerData} spot={spotData} setConfirmModal={setConfirmModal} showNotification={showNotification} />;
+            case 'premium':
+                return <PremiumTab partner={partnerData} setActiveTab={setActiveTab} />;
             case 'settings':
                 return <PartnerSettingsTab partner={partnerData} />;
             default:
@@ -3420,6 +3422,12 @@ export const PartnerDashboard = ({ onLogout, partnerData }) => {
                         label={t('eventsTab')}
                         active={activeTab === 'events'}
                         onClick={() => setActiveTab('events')}
+                    />
+                    <PartnerNavItem
+                        icon={<Sparkles className="text-[#D4AF37]" />}
+                        label="Premium"
+                        active={activeTab === 'premium'}
+                        onClick={() => setActiveTab('premium')}
                     />
                     <PartnerNavItem
                         icon={<Settings />}
@@ -4408,6 +4416,92 @@ export const EventsTab = ({ partner, spot, setConfirmModal, showNotification }) 
     );
 };
 
+export const PremiumTab = ({ partner, setActiveTab }) => {
+    return (
+        <div className="space-y-10 animate-in fade-in zoom-in-95 duration-500">
+            {/* Hero Section */}
+            <div className="bg-black dark:bg-gray-900 rounded-[2.5rem] p-12 lg:p-16 text-white shadow-2xl relative overflow-hidden group border border-[#D4AF37]/20">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/10 to-transparent pointer-events-none"></div>
+                <div className="relative z-10 max-w-2xl">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#D4AF37]/20 text-[#D4AF37] text-[10px] font-black uppercase tracking-widest mb-8 border border-[#D4AF37]/30">
+                        <Sparkles size={14} className="animate-pulse" />
+                        <span>Mysuru Marga Premium</span>
+                    </div>
+                    <h2 className="text-4xl lg:text-5xl font-serif mb-6 leading-tight">
+                        Elevate Your Heritage <br />
+                        <span className="text-[#D4AF37]">Capture the Soul of Mysuru.</span>
+                    </h2>
+                    <p className="text-gray-400 text-sm lg:text-base leading-relaxed mb-10 max-w-xl font-medium">
+                        Join the exclusive tier of certified heritage partners. Gain priority placement across the map, unlock deep traveler insights, and amplify your visibility to thousands of explorers daily.
+                    </p>
+                    <button className="bg-[#D4AF37] hover:bg-[#c4a132] text-black px-10 py-5 rounded-2xl font-black text-xs uppercase tracking-widest shadow-[0_0_40px_rgba(212,175,55,0.4)] transition-all hover:scale-105 active:scale-95 flex items-center gap-3">
+                        Upgrade Now
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
+                    </button>
+                    <p className="mt-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Cancel anytime. 14-day money-back guarantee.</p>
+                </div>
+
+                {/* Decorative Elements */}
+                <div className="absolute right-0 top-0 w-1/2 h-full opacity-20 pointer-events-none hidden md:block">
+                    <div className="absolute right-10 top-10 w-64 h-64 bg-[#D4AF37] rounded-full blur-[100px]"></div>
+                </div>
+                <Sparkles className="absolute -bottom-10 -right-10 w-64 h-64 text-[#D4AF37] opacity-10 group-hover:scale-110 group-hover:rotate-12 transition-all duration-1000" />
+            </div>
+
+            {/* Premium Benefits Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl p-10 rounded-[2rem] border border-gray-100 dark:border-gray-800 shadow-xl group hover:-translate-y-2 transition-transform duration-300">
+                    <div className="w-16 h-16 rounded-2xl bg-amber-50 dark:bg-amber-900/20 text-amber-500 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-inner">
+                        <Star size={32} className="fill-current" />
+                    </div>
+                    <h3 className="text-xl font-serif text-black dark:text-white mb-4">Top Placement</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed font-medium">
+                        Your spot will be highlighted at the paramount of search results and showcased on the explore page. Premium spots receive 3x more visibility.
+                    </p>
+                </div>
+
+                <div className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl p-10 rounded-[2rem] border border-gray-100 dark:border-gray-800 shadow-xl group hover:-translate-y-2 transition-transform duration-300">
+                    <div className="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-inner">
+                        <LayoutDashboard size={32} />
+                    </div>
+                    <h3 className="text-xl font-serif text-black dark:text-white mb-4">Deep Analytics</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed font-medium">
+                        Understand your audience with advanced analytics. Track profile views, interaction rates, and traveler demographics in real-time.
+                    </p>
+                </div>
+
+                <div className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl p-10 rounded-[2rem] border border-gray-100 dark:border-gray-800 shadow-xl group hover:-translate-y-2 transition-transform duration-300">
+                    <div className="w-16 h-16 rounded-2xl bg-purple-50 dark:bg-purple-900/20 text-purple-500 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-inner">
+                        <Users size={32} />
+                    </div>
+                    <h3 className="text-xl font-serif text-black dark:text-white mb-4">Priority Support</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed font-medium">
+                        Skip the queue. Get direct access to our dedicated heritage curation team to help optimize your spot profile and create engaging events.
+                    </p>
+                </div>
+            </div>
+
+            {/* Testimonial / Social Proof */}
+            <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 rounded-[2rem] p-10 border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col md:flex-row items-center gap-10">
+                <div className="w-24 h-24 shrink-0 rounded-full overflow-hidden shadow-xl border-4 border-white dark:border-gray-700">
+                    <img src="https://i.pravatar.cc/150?img=33" alt="Partner Testimonial" className="w-full h-full object-cover" />
+                </div>
+                <div>
+                    <div className="flex text-[#D4AF37] mb-3">
+                        {[1, 2, 3, 4, 5].map(i => <Star key={i} size={16} className="fill-current" />)}
+                    </div>
+                    <p className="text-lg md:text-xl font-serif text-gray-900 dark:text-white italic mb-4">
+                        "Upgrading to Premium was the best decision for our heirloom silk shop. Our footfall increased dramatically within the first month just from the priority map placement."
+                    </p>
+                    <div>
+                        <p className="text-sm font-bold text-gray-900 dark:text-gray-200">Ravi Shankar</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-[#D4AF37]">Mysuru Silk Emporium</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 export const ProfilePage = ({ onBack, isDarkMode, onToggleDarkMode, onLogout, userData, onUpdateProfile, savedPlaceIds, allPlaces }) => {
     const [currentView, setCurrentView] = useState('main');
