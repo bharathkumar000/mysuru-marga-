@@ -60,5 +60,17 @@
     "heritageEventsOffers": "Heritage Events & Offers",
     "designEventDesc": "Design exclusive experiences, workshops, or traditional gatherings for the community.",
     "designEventBtn": "Design Event",
-    "noActiveEvents": "No active events or offers"
+    "noActiveEvents": "No active events or offers",
+    "profileTitle": "Profile",
+    "guestUser": "Guest User",
+    "noEmailProvided": "No email provided",
+    "privacySettings": "Privacy Settings",
+    "wishlist": "Wishlist",
+    "helpSupport": "Help & Support",
+    "aboutApp": "About App",
+    "shareFeedback": "Share Feedback",
+    "darkMode": "Dark Mode",
+    "locationServices": "Location Services",
+    "version": "Version",
+    "premiumTab": "Premium"
 }

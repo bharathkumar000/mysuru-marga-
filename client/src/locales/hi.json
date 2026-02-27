@@ -60,5 +60,17 @@
     "heritageEventsOffers": "विरासत कार्यक्रम और ऑफ़र",
     "designEventDesc": "समुदाय के लिए विशेष अनुभव, कार्यशालाएँ या पारंपरिक समारोह डिज़ाइन करें।",
     "designEventBtn": "कार्यक्रम डिज़ाइन करें",
-    "noActiveEvents": "कोई सक्रिय कार्यक्रम या ऑफ़र नहीं"
+    "noActiveEvents": "कोई सक्रिय कार्यक्रम या ऑफ़र नहीं",
+    "profileTitle": "प्रोफ़ाइल",
+    "guestUser": "अतिथि उपयोगकर्ता",
+    "noEmailProvided": "कोई ईमेल नहीं दिया गया",
+    "privacySettings": "गोपनीयता सेटिंग्स",
+    "wishlist": "इच्छा-सूची",
+    "helpSupport": "सहायता और समर्थन",
+    "aboutApp": "ऐप के बारे में",
+    "shareFeedback": "प्रतिक्रिया साझा करें",
+    "darkMode": "डार्क मोड",
+    "locationServices": "स्थान सेवाएँ",
+    "version": "संस्करण",
+    "premiumTab": "प्रीमियम"
 }
