@@ -20,6 +20,7 @@ export default {
           800: '#7E4716',
           900: '#673B16',
           950: '#3A1E08',
+          gold: '#D4AF37',
         },
       },
       backgroundImage: {

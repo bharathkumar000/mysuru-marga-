@@ -58,6 +58,18 @@
   .dark .custom-scrollbar {
     scrollbar-color: #374151 transparent;
   }
+
+  .gold-gradient {
+    background: linear-gradient(135deg, #75410A 0%, #9E6924 35%, #BF944A 70%, #D5B26F 100%);
+  }
+
+  .light-gold-gradient {
+    background: linear-gradient(135deg, #FAF7F2 0%, #F5F0E6 100%);
+  }
+
+  .text-gold-heritage {
+    color: #75410A;
+  }
 }
 
 /* Auth Slider Transitions */

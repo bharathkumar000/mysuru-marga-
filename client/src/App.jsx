@@ -30,37 +30,162 @@ export const supabase = (supabaseUrl && supabaseAnonKey)
     : null;
 
 
-export const LanguageSelector = () => {
-    const { i18n, t } = useTranslation();
 
-    const languages = [
-        { code: 'en', label: 'English' },
-        { code: 'kn', label: 'ಕನ್ನಡ' },
-        { code: 'hi', label: 'हिंदी' }
-    ];
+export const ChatBot = () => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [messages, setMessages] = useState([
+        {
+            role: 'assistant',
+            content: "Greetings, traveler! I am your Heritage Guide to the City of Palaces. Pranam! How may I assist your exploration of Mysuru today?"
+        }
+    ]);
+    const [inputMessage, setInputMessage] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const messagesEndRef = useRef(null);
+    const inputRef = useRef(null);
 
-    const changeLanguage = (lng) => {
-        i18n.changeLanguage(lng);
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
+
+    useEffect(() => {
+        if (isOpen && inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [isOpen]);
+
+    const sendMessage = async () => {
+        if (!inputMessage.trim() || isLoading) return;
+
+        const userMessage = inputMessage.trim();
+        setInputMessage('');
+
+        setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+        setIsLoading(true);
+
+        // Simulated Royal Heritage AI response
+        setTimeout(() => {
+            const responses = [
+                "A fine query! The Amba Vilas Palace is best viewed at twilight when its illumination begins.",
+                "Mysuru Silk is a legacy of the Wadiyars. For the most authentic experience, visit the Government Silk Weaving Factory.",
+                "The fragrance of Sandalwood is the soul of our city. I recommend exploring the local markets near Devaraja Market.",
+                "Mysore Pak was invented in the royal kitchens. You must try it at Guru Sweet Mart, the direct descendants of the inventor!"
+            ];
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+
+            setMessages(prev => [...prev, { role: 'assistant', content: randomResponse }]);
+            setIsLoading(false);
+        }, 1500);
+    };
+
+    const handleKey = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
     };
 
     return (
-        <div className="flex flex-wrap gap-2">
-            {languages.map((lang) => (
+        <div className="fixed bottom-24 right-6 md:bottom-8 md:right-8 z-[1000] font-sans">
+            {!isOpen ? (
                 <button
-                    key={lang.code}
-                    onClick={() => changeLanguage(lang.code)}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border transition-all duration-300 font-bold text-xs uppercase tracking-widest ${i18n.language === lang.code
-                        ? 'bg-black dark:bg-[#D4AF37] text-white dark:text-black border-transparent shadow-lg shadow-black/10 dark:shadow-[#D4AF37]/20 scale-[1.05]'
-                        : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-800 text-gray-400 hover:border-gray-200 dark:hover:border-gray-700 hover:text-gray-900 dark:hover:text-white shadow-sm'
-                        }`}
+                    onClick={() => setIsOpen(true)}
+                    className="w-16 h-16 bg-gradient-to-br from-[#D4AF37] via-[#B8941F] to-[#8A6D14] text-black rounded-full shadow-[0_10px_30px_rgba(212,175,55,0.4)] hover:scale-110 active:scale-95 transition-all duration-300 flex items-center justify-center group border-2 border-white/20"
                 >
-                    <span>{lang.label}</span>
+                    <div className="relative">
+                        <MessageSquare className="w-7 h-7 group-hover:rotate-12 transition-transform" />
+                        <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 border border-white"></span>
+                        </span>
+                    </div>
                 </button>
-            ))}
+            ) : (
+                <div className="w-[350px] sm:w-[380px] h-[550px] bg-[#111827] rounded-[2.5rem] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6)] flex flex-col overflow-hidden border border-[#D4AF37]/30 border-b-8 border-b-[#D4AF37] animate-in slide-in-from-bottom-6 transition-all">
+                    {/* Royal Header */}
+                    <div className="p-6 bg-gradient-to-r from-[#111827] to-[#1f2937] flex items-center justify-between border-b border-[#D4AF37]/20">
+                        <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-2xl bg-[#D4AF37] flex items-center justify-center p-2.5 shadow-[0_0_15px_rgba(212,175,55,0.3)]">
+                                <Compass className="w-full h-full text-[#111827]" />
+                            </div>
+                            <div>
+                                <h3 className="text-[#D4AF37] font-serif text-lg leading-none mb-1">Heritage Guide</h3>
+                                <p className="text-gray-400 text-[10px] uppercase font-bold tracking-widest">Sovereign Edition</p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={() => setIsOpen(false)}
+                            className="bg-white/5 hover:bg-white/10 p-2 rounded-xl transition-all"
+                        >
+                            <X className="w-5 h-5 text-gray-400" />
+                        </button>
+                    </div>
+
+                    {/* Royal Conversations */}
+                    <div className="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar bg-[url('https://www.transparenttextures.com/patterns/black-paper.png')]">
+                        {messages.map((m, idx) => (
+                            <div key={idx} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in duration-500`}>
+                                <div className={`relative px-4 py-3 rounded-2xl text-sm leading-relaxed max-w-[85%] shadow-xl ${m.role === 'user'
+                                    ? 'bg-[#D4AF37] text-[#111827] rounded-tr-none font-bold'
+                                    : 'bg-white/5 text-gray-200 border border-[#D4AF37]/20 rounded-tl-none font-medium backdrop-blur-md'
+                                    }`}>
+                                    {m.content}
+                                    {m.role === 'assistant' && (
+                                        <div className="absolute -left-2 -top-2 w-5 h-5 bg-[#D4AF37] rounded-full flex items-center justify-center shadow-lg border-2 border-[#111827]">
+                                            <Sparkles className="w-2.5 h-2.5 text-[#111827]" />
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                        {isLoading && (
+                            <div className="flex justify-start">
+                                <div className="bg-white/5 border border-[#D4AF37]/20 rounded-2xl px-5 py-3 rounded-tl-none flex items-center gap-3">
+                                    <div className="flex gap-1">
+                                        <span className="w-1.5 h-1.5 bg-[#D4AF37] rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                                        <span className="w-1.5 h-1.5 bg-[#D4AF37] rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                                        <span className="w-1.5 h-1.5 bg-[#D4AF37] rounded-full animate-bounce"></span>
+                                    </div>
+                                    <span className="text-[10px] italic text-[#D4AF37] font-serif">Consulting chronicles...</span>
+                                </div>
+                            </div>
+                        )}
+                        <div ref={messagesEndRef} />
+                    </div>
+
+                    {/* Royal Input */}
+                    <div className="p-6 bg-[#111827] border-t border-[#D4AF37]/10">
+                        <div className="relative group">
+                            <textarea
+                                ref={inputRef}
+                                value={inputMessage}
+                                onChange={(e) => setInputMessage(e.target.value)}
+                                onKeyDown={handleKey}
+                                placeholder="Consult the Guide..."
+                                rows="1"
+                                className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 pr-14 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/30 transition-all resize-none custom-scrollbar"
+                            />
+                            <button
+                                onClick={sendMessage}
+                                disabled={!inputMessage.trim() || isLoading}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#D4AF37] hover:scale-110 active:scale-95 text-[#111827] rounded-xl flex items-center justify-center transition-all disabled:opacity-50 disabled:scale-100 shadow-[0_0_15px_rgba(212,175,55,0.2)]"
+                            >
+                                <Send className="w-5 h-5" />
+                            </button>
+                        </div>
+                        <p className="text-[9px] text-gray-500 mt-3 text-center uppercase tracking-widest font-bold">
+                            Royal Heritage Intelligence
+                        </p>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
-
 
 export const BottomNavItem = ({ icon: _Icon, label, active, onClick }) => {
     return (
@@ -78,8 +203,8 @@ export const BottomNavItem = ({ icon: _Icon, label, active, onClick }) => {
 export const BottomNav = ({ activeTab, setActiveTab }) => {
     const { t } = useTranslation();
     return (
-        <div className="w-full bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl border-t border-white/20 dark:border-gray-800 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] h-24 pb-6 md:pb-2 z-50 shrink-0 transition-colors duration-200 rounded-t-[2rem]">
-            <div className="flex justify-around items-center h-full px-2">
+        <div className="w-full bg-white/80 dark:bg-gray-950/80 backdrop-blur-2xl border-t border-white/20 dark:border-gray-800 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] h-24 pb-8 md:pb-2 z-50 shrink-0 transition-colors duration-200 rounded-t-[2.5rem]">
+            <div className="flex justify-around items-center h-full px-4">
                 <BottomNavItem
                     icon={Home}
                     label={t('home')}
@@ -104,6 +229,12 @@ export const BottomNav = ({ activeTab, setActiveTab }) => {
                     active={activeTab === 'saved'}
                     onClick={() => setActiveTab('saved')}
                 />
+                <BottomNavItem
+                    icon={Sparkles}
+                    label="Planner"
+                    active={activeTab === 'planner'}
+                    onClick={() => setActiveTab('planner')}
+                />
 
             </div>
         </div>
@@ -111,28 +242,33 @@ export const BottomNav = ({ activeTab, setActiveTab }) => {
 };
 
 
-export const CategoryItem = ({ icon: _Icon, label, color, bgColor }) => (
-    <div className="flex flex-col items-center gap-3 min-w-[80px] group cursor-pointer">
-        <div className={`w-16 h-16 rounded-full ${bgColor} flex items-center justify-center shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:shadow-md`}>
-            <_Icon className={`w-7 h-7 ${color}`} />
+export const CategoryItem = ({ icon: _Icon, label, color, bgColor, onClick, isSelected }) => (
+    <div
+        onClick={() => onClick && onClick(label)}
+        className="flex flex-col items-center gap-3 min-w-[80px] group cursor-pointer"
+    >
+        <div className={`w-16 h-16 rounded-full flex items-center justify-center shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:shadow-md ${isSelected ? 'bg-[#D4AF37] ring-4 ring-[#D4AF37]/30 shadow-lg scale-110' : bgColor}`}>
+            <_Icon className={`w-7 h-7 ${isSelected ? 'text-white' : color}`} />
         </div>
-        <span className="text-[11px] font-bold text-gray-600 dark:text-gray-400 text-center tracking-tight group-hover:text-gray-900 dark:group-hover:text-white transition-colors">{label}</span>
+        <span className={`text-[11px] font-bold text-center tracking-tight transition-colors ${isSelected ? 'text-[#D4AF37]' : 'text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white'}`}>{label}</span>
     </div>
 );
 
-export const Categories = ({ onSeeAllClick }) => {
+export const Categories = ({ onSeeAllClick, onCategoryClick, selectedCategory }) => {
     const categories = [
+        { icon: LayoutDashboard, label: "Explore", color: "text-blue-600 dark:text-blue-400", bgColor: "bg-blue-50 dark:bg-blue-900/20" },
         { icon: Sparkles, label: "Hidden Gems", color: "text-mysore-600 dark:text-mysore-400", bgColor: "bg-mysore-100 dark:bg-mysore-900/20" },
         { icon: Palette, label: "Artisans", color: "text-rose-600 dark:text-rose-400", bgColor: "bg-rose-50 dark:bg-rose-900/20" },
         { icon: Utensils, label: "Food", color: "text-emerald-600 dark:text-emerald-400", bgColor: "bg-emerald-50 dark:bg-emerald-900/20" },
-        { icon: MapPin, label: "Near You", color: "text-purple-600 dark:text-purple-400", bgColor: "bg-purple-50 dark:bg-purple-900/20" },
         { icon: Landmark, label: "Heritage", color: "text-amber-700 dark:text-amber-500", bgColor: "bg-amber-100 dark:bg-amber-900/30" },
         { icon: TreePine, label: "Nature", color: "text-green-600 dark:text-green-400", bgColor: "bg-green-50 dark:bg-green-900/20" },
+        { icon: Compass, label: "Adventure", color: "text-indigo-600 dark:text-indigo-400", bgColor: "bg-indigo-50 dark:bg-indigo-900/20" },
+        { icon: Store, label: "Stays", color: "text-purple-600 dark:text-purple-400", bgColor: "bg-purple-50 dark:bg-purple-900/20" },
     ];
 
     return (
         <div className="py-6 transition-colors duration-200">
-            <div className="flex justify-between items-center px-6 mb-4">
+            <div className="flex justify-between items-center px-8 md:px-12 mb-4">
                 <h3 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">Browse Categories</h3>
                 <button
                     onClick={onSeeAllClick}
@@ -142,9 +278,9 @@ export const Categories = ({ onSeeAllClick }) => {
                 </button>
             </div>
 
-            <div className="flex overflow-x-auto gap-4 px-6 pb-4 custom-scrollbar snap-x md:grid md:grid-cols-6 md:px-0 md:justify-items-center md:pb-0 md:overflow-visible md:gap-8">
+            <div className="flex overflow-x-auto gap-4 px-8 pb-4 custom-scrollbar snap-x md:flex md:flex-wrap md:justify-around md:px-12 md:pb-0 md:overflow-visible md:gap-8">
                 {categories.map((cat, index) => (
-                    <CategoryItem key={index} {...cat} />
+                    <CategoryItem key={index} {...cat} onClick={onCategoryClick} isSelected={selectedCategory === cat.label} />
                 ))}
             </div>
         </div>
@@ -206,7 +342,7 @@ export const EventsSection = ({ events = [] }) => {
 
     return (
         <div className="py-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
-            <div className="flex justify-between items-center px-5 mb-6">
+            <div className="flex justify-between items-center px-8 md:px-12 mb-6">
                 <div>
                     <h3 className="text-2xl font-serif text-gray-900 dark:text-white">Upcoming Events</h3>
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#D4AF37] mt-1">Heritage festivals & workshops</p>
@@ -216,7 +352,7 @@ export const EventsSection = ({ events = [] }) => {
                 </button>
             </div>
 
-            <div className="flex space-x-5 overflow-x-auto px-5 pb-6 custom-scrollbar scroll-smooth">
+            <div className="flex space-x-5 overflow-x-auto px-8 md:px-12 pb-6 custom-scrollbar scroll-smooth">
                 {events.map((event, index) => (
                     <EventCard key={event.id || index} event={event} />
                 ))}
@@ -226,38 +362,61 @@ export const EventsSection = ({ events = [] }) => {
 };
 
 
-export const Explore = ({ places, onCardClick, savedPlaceIds = [], onToggleSave }) => {
+export const Explore = ({ places, onCardClick, savedPlaceIds = [], onToggleSave, selectedCategory, onCategoryClick }) => {
     const [searchQuery, setSearchQuery] = useState('');
 
-    const filteredPlaces = places.filter(place =>
-        place.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        place.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        place.description.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredPlaces = places.filter(place => {
+        const matchesSearch = place.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            place.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            place.description.toLowerCase().includes(searchQuery.toLowerCase());
+
+        const matchesCategory = !selectedCategory || selectedCategory === 'Explore' ||
+            place.category.toLowerCase().includes(selectedCategory.toLowerCase()) ||
+            (selectedCategory === 'Hidden Gems' && place.category === 'Hidden Gem');
+
+        // Only show "famous" places (rating >= 4.5)
+        const isFamous = place.rating >= 4.5;
+
+        return matchesSearch && matchesCategory && isFamous;
+    });
 
     return (
-        <div className="pb-20">
-            <div className="sticky top-0 bg-white dark:bg-gray-900 z-10 px-4 py-3 border-b border-gray-100 dark:border-gray-800 transition-colors">
-                <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+        <div className="pb-32 bg-mysore-50 dark:bg-gray-950 min-h-screen">
+            <div className="sticky top-0 bg-mysore-50/80 dark:bg-gray-950/80 backdrop-blur-xl z-30 px-8 md:px-12 py-6 border-b border-gray-100 dark:border-gray-900 transition-all">
+                <div className="relative w-full">
+                    <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <input
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Search hidden gems, artisans, food..."
-                        className="w-full bg-gray-100 dark:bg-gray-800 rounded-full py-2 pl-10 pr-4 text-sm dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 transition-colors placeholder-gray-500 dark:placeholder-gray-400"
+                        placeholder="Search heritage, nature, food..."
+                        className="w-full bg-gray-50 dark:bg-gray-900 rounded-[1.5rem] py-4 pl-14 pr-6 text-sm font-medium dark:text-gray-200 focus:outline-none focus:ring-4 focus:ring-[#D4AF37]/10 transition-all placeholder-gray-400"
                     />
                 </div>
             </div>
 
-            <Categories />
+            <div className="mt-8">
+                <Categories onCategoryClick={onCategoryClick} selectedCategory={selectedCategory} />
+            </div>
 
-            <div className="px-4 py-4">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
-                    {searchQuery ? `Search Results (${filteredPlaces.length})` : 'All Experiences'}
-                </h3>
+            <div className="px-8 md:px-12 py-10">
+                <div className="flex items-center justify-between mb-8">
+                    <div className="flex flex-col gap-1">
+                        <h3 className="text-3xl font-serif text-gray-900 dark:text-white">
+                            {selectedCategory && selectedCategory !== 'Explore' ? selectedCategory : 'All Experiences'}
+                        </h3>
+                        {searchQuery && (
+                            <p className="text-xs text-gray-400 font-medium">Showing results for "{searchQuery}"</p>
+                        )}
+                    </div>
+                    <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#D4AF37]">
+                        <Compass size={14} />
+                        <span>Discovering Mysuru</span>
+                    </div>
+                </div>
+
                 {filteredPlaces.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                         {filteredPlaces.map(place => (
                             <PlaceCard
                                 key={place.id}
@@ -269,8 +428,11 @@ export const Explore = ({ places, onCardClick, savedPlaceIds = [], onToggleSave 
                         ))}
                     </div>
                 ) : (
-                    <div className="text-center py-10 text-gray-500 dark:text-gray-400">
-                        No places found matching "{searchQuery}"
+                    <div className="text-center py-32 bg-gray-50 dark:bg-gray-900 rounded-[3rem] border border-dashed border-gray-200 dark:border-gray-800">
+                        <Search size={48} className="mx-auto text-gray-300 mb-6" />
+                        <p className="text-gray-500 dark:text-gray-400 font-bold uppercase tracking-widest text-xs">
+                            No heritage found matching "{searchQuery}"
+                        </p>
                     </div>
                 )}
             </div>
@@ -344,12 +506,12 @@ export const FeaturedCard = ({ place, onClick, isSaved, onToggleSave }) => (
 );
 
 export const FeaturedSection = ({ places = [], onCardClick, savedPlaceIds = [], onToggleSave, onSeeAllClick }) => {
-    // Show first 5 places from the dynamic list for mobile scroll, or 4 for desktop grid
-    const displayPlaces = places.length > 0 ? places.slice(0, 5) : featuredPlaces;
+    // Show all available places in the featured grid
+    const displayPlaces = places.length > 0 ? places : featuredPlaces;
 
     return (
         <div className="py-8 transition-colors duration-200">
-            <div className="flex justify-between items-end px-5 md:px-0 mb-8">
+            <div className="flex justify-between items-end px-8 md:px-12 mb-8">
                 <div>
                     <span className="text-[#D4AF37] font-black text-xs uppercase tracking-[0.3em] mb-2 block">Curated Collection</span>
                     <h3 className="text-3xl md:text-5xl font-serif text-gray-900 dark:text-white leading-none">Featured Spots</h3>
@@ -363,7 +525,7 @@ export const FeaturedSection = ({ places = [], onCardClick, savedPlaceIds = [], 
             </div>
 
             {/* Responsive Container: Horizontal Scroll on Mobile, Grid on Desktop */}
-            <div className="flex space-x-6 overflow-x-auto px-5 pb-8 md:px-0 md:pb-0 md:space-x-0 md:grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 md:gap-8 custom-scrollbar md:overflow-visible snap-x">
+            <div className="flex space-x-6 overflow-x-auto px-8 pb-8 md:px-12 md:pb-0 md:space-x-0 md:grid md:grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 md:gap-8 custom-scrollbar md:overflow-visible snap-x">
                 {displayPlaces.map((place, index) => (
                     <div
                         key={place.id}
@@ -511,7 +673,7 @@ export const FeedbackSection = ({ userEmail, onSuccess }) => {
 
 export const Hero = ({ onExploreClick }) => {
     return (
-        <div className="px-5 pt-8 pb-4 space-y-8 md:px-0 md:pt-12 md:pb-12">
+        <div className="px-8 pt-8 pb-4 space-y-8 md:px-12 md:pt-12 md:pb-12">
             {/* Modern Search Bar */}
             <div className="relative group z-30 md:max-w-2xl md:mx-auto transform hover:-translate-y-1 transition-transform duration-300">
                 <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
@@ -994,7 +1156,7 @@ export const Navbar = ({ onProfileClick, activeTab, setActiveTab }) => {
         <button
             onClick={() => setActiveTab(id)}
             className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 ${activeTab === id
-                ? 'bg-mysore-100 dark:bg-mysore-900/30 text-mysore-700 dark:text-mysore-400 font-bold'
+                ? 'bg-[#D4AF37] text-white shadow-lg shadow-[#D4AF37]/30 font-bold'
                 : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800'
                 }`}
         >
@@ -1004,7 +1166,7 @@ export const Navbar = ({ onProfileClick, activeTab, setActiveTab }) => {
     );
 
     return (
-        <nav className="flex justify-between items-center px-6 py-6 border-b border-transparent md:border-gray-100 md:dark:border-gray-800 transition-colors duration-200">
+        <nav className="flex justify-between items-center px-8 md:px-12 py-6 border-b border-transparent md:border-gray-100 md:dark:border-gray-800 transition-colors duration-200">
             <div className="flex flex-col cursor-pointer" onClick={() => setActiveTab && setActiveTab('home')}>
                 <span className="text-sm font-medium text-gray-500 dark:text-gray-400 tracking-wide hidden md:block">Welcome to</span>
                 <h1 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">
@@ -1014,10 +1176,11 @@ export const Navbar = ({ onProfileClick, activeTab, setActiveTab }) => {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-2 bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl p-1.5 rounded-full border border-gray-200 dark:border-gray-800 shadow-sm">
-                <NavLink id="home" icon={Home} label={t('home')} />
-                <NavLink id="explore" icon={Compass} label={t('explore')} />
-                <NavLink id="MapComponent" icon={MapIcon} label={t('map')} />
-                <NavLink id="saved" icon={Heart} label={t('saved')} />
+                <NavLink id="home" icon={Home} label="Home" />
+                <NavLink id="explore" icon={Compass} label="Explore" />
+                <NavLink id="MapComponent" icon={MapIcon} label="Map" />
+                <NavLink id="saved" icon={Heart} label="Saved" />
+                <NavLink id="planner" icon={Sparkles} label="Planner" />
             </div>
 
             <button
@@ -2222,15 +2385,15 @@ export const AuthPage = ({ onLogin, onSignUp }) => {
         const identifier = loginIdentifier.trim();
         const password = loginPassword.trim();
 
-        // DEV SHORTCUTS: 1 = User, 2 = Partner, 3 = Admin
-        if (identifier === '1') {
+        // DEV SHORTCUTS: 1 = User with pass 1, 2 = Partner with pass 2
+        if (identifier === '1' && password === '1') {
             const user = { fullName: 'Demo User', email: 'user@test.com', role: 'user', joinedAt: new Date().toISOString() };
             localStorage.setItem('userData', JSON.stringify(user));
             onLogin('user', user);
             setIsLoggingIn(false);
             return;
         }
-        if (identifier === '2') {
+        if (identifier === '2' && password === '2') {
             const partner = { fullName: 'Demo Partner', email: 'partner@test.com', role: 'partner', joinedAt: new Date().toISOString() };
             localStorage.setItem('userData', JSON.stringify(partner));
             onLogin('partner', partner);
@@ -2661,6 +2824,408 @@ export const AuthPage = ({ onLogin, onSignUp }) => {
     );
 };
 
+
+
+export const TravaAI = ({ onBack }) => {
+    const [mode, setMode] = useState('chat'); // 'chat' or 'planner'
+    const [formData, setFormData] = useState({
+        tripName: '',
+        startingFrom: '',
+        destinations: '',
+        travelers: '1',
+        theme: 'Heritage',
+        persona: 'Family',
+        interests: [],
+        startDate: '',
+        endDate: '',
+        pace: 'Balanced',
+        arrivalTime: '',
+        departureTime: '',
+        budget: 'Moderate',
+        accommodation: 'Comfort',
+        diet: 'ALL',
+        transport: 'Personal',
+        vehicleType: 'Car',
+        specialRequests: ''
+    });
+
+    const [messages, _setMessages] = useState([
+        { role: 'assistant', content: 'Namaskara! I am Trava AI, your personal Mysuru travel companion. How can I help you explore the city today?' }
+    ]);
+    const [input, setInput] = useState('');
+
+    const toggleInterest = (interest) => {
+        setFormData(prev => ({
+            ...prev,
+            interests: prev.interests.includes(interest)
+                ? prev.interests.filter(i => i !== interest)
+                : [...prev.interests, interest]
+        }));
+    };
+
+    const renderChat = () => (
+        <div className="flex flex-col h-full animate-in fade-in duration-700">
+            <div className="flex-1 overflow-y-auto px-8 md:px-12 py-8 space-y-6 custom-scrollbar pb-32">
+                {messages.map((m, i) => (
+                    <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-2 duration-500`}>
+                        <div className={`relative max-w-[80%] md:max-w-[70%] p-5 rounded-3xl ${m.role === 'user'
+                            ? 'bg-[#D4AF37] text-black shadow-xl shadow-amber-900/10 rounded-tr-none font-bold'
+                            : 'bg-white dark:bg-gray-800 border border-[#D4AF37]/20 dark:border-gray-700 text-gray-800 dark:text-gray-200 shadow-sm rounded-tl-none font-medium'}`}>
+                            <p className="text-sm md:text-base leading-relaxed">{m.content}</p>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12 z-20">
+                <div className="max-w-4xl mx-auto bg-white/80 dark:bg-gray-900/80 backdrop-blur-2xl p-6 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-white/20 dark:border-gray-800">
+                    <div className="flex gap-2 mb-4 overflow-x-auto pb-2 scrollbar-hide">
+                        {["Tell me about Somnathpur", "Best period to visit?", "Top 5 local eateries"].map(s => (
+                            <button key={s} onClick={() => setInput(s)} className="whitespace-nowrap px-5 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-full text-[10px] font-black uppercase tracking-widest text-gray-500 hover:border-[#D4AF37] hover:text-[#D4AF37] transition-all transform hover:scale-105 active:scale-95">
+                                {s}
+                            </button>
+                        ))}
+                    </div>
+                    <div className="relative group">
+                        <input
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            placeholder="Type your curiosity about Mysuru..."
+                            className="w-full bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-2xl py-5 pl-7 pr-16 text-sm md:text-base focus:outline-none focus:ring-4 focus:ring-[#D4AF37]/10 transition-all placeholder-gray-400 font-medium"
+                        />
+                        <button className="absolute right-3 top-1/2 -translate-y-1/2 w-12 h-12 bg-black dark:bg-[#D4AF37] rounded-xl flex items-center justify-center text-white dark:text-black shadow-lg shadow-black/10 hover:scale-110 active:scale-90 transition-all">
+                            <Send size={20} />
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+
+    const renderPlanner = () => (
+        <div className="h-full overflow-y-auto px-8 md:px-12 pt-10 pb-40 space-y-12 animate-in slide-in-from-bottom-4 duration-1000 custom-scrollbar">
+            {/* Trip Essentials Card */}
+            <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl p-8 md:p-10 rounded-[3rem] border border-white dark:border-gray-800 shadow-xl space-y-8">
+                <div className="flex items-center gap-4">
+                    <div className="p-3 bg-amber-100 dark:bg-[#D4AF37]/10 rounded-2xl shadow-inner">
+                        <Compass className="w-6 h-6 text-[#D4AF37]" />
+                    </div>
+                    <div>
+                        <h3 className="text-2xl font-serif text-gray-900 dark:text-white">Trip Essentials</h3>
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#D4AF37] mt-1">Foundational details for your visit</p>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Trip Identity</label>
+                        <div className="relative group">
+                            <Tag className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 group-focus-within:text-[#D4AF37] transition-colors" />
+                            <input value={formData.tripName} onChange={e => setFormData({ ...formData, tripName: e.target.value })} placeholder="e.g., Summer in Royal City" className="w-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 pl-14 pr-6 py-5 rounded-[1.5rem] text-sm font-medium focus:ring-4 focus:ring-[#D4AF37]/10 outline-none transition-all shadow-sm" />
+                        </div>
+                    </div>
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Origin City</label>
+                        <div className="relative group">
+                            <MapPin className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 group-focus-within:text-[#D4AF37] transition-colors" />
+                            <input value={formData.startingFrom} onChange={e => setFormData({ ...formData, startingFrom: e.target.value })} placeholder="e.g., Bangalore / Delhi" className="w-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 pl-14 pr-6 py-5 rounded-[1.5rem] text-sm font-medium focus:ring-4 focus:ring-[#D4AF37]/10 outline-none transition-all shadow-sm" />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Specific Destinations</label>
+                        <div className="relative group">
+                            <Landmark className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 group-focus-within:text-[#D4AF37] transition-colors" />
+                            <input value={formData.destinations} onChange={e => setFormData({ ...formData, destinations: e.target.value })} placeholder="Srigiripura, Devaraja Market..." className="w-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 pl-14 pr-6 py-5 rounded-[1.5rem] text-sm font-medium focus:ring-4 focus:ring-[#D4AF37]/10 outline-none transition-all shadow-sm" />
+                        </div>
+                    </div>
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Traveling Party Size</label>
+                        <div className="relative group">
+                            <Users className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 group-focus-within:text-[#D4AF37] transition-colors" />
+                            <input type="number" min="1" value={formData.travelers} onChange={e => setFormData({ ...formData, travelers: e.target.value })} className="w-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 pl-14 pr-6 py-5 rounded-[1.5rem] text-sm font-bold focus:ring-4 focus:ring-[#D4AF37]/10 outline-none transition-all shadow-sm" />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="space-y-3">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Core Heritage Theme</label>
+                    <div className="relative group">
+                        <Sparkles className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 group-focus-within:text-[#D4AF37] transition-colors" />
+                        <select value={formData.theme} onChange={e => setFormData({ ...formData, theme: e.target.value })} className="w-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 pl-14 pr-6 py-5 rounded-[1.5rem] text-sm font-bold appearance-none focus:ring-4 focus:ring-[#D4AF37]/10 outline-none transition-all cursor-pointer shadow-sm">
+                            <option>Heritage</option>
+                            <option>Nature</option>
+                            <option>Adventure</option>
+                            <option>Peace</option>
+                        </select>
+                        <ChevronRight className="absolute right-6 top-1/2 -translate-y-1/2 rotate-90 text-gray-400" size={18} />
+                    </div>
+                </div>
+            </div>
+
+            {/* Persona & Interests Card */}
+            <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl p-8 md:p-10 rounded-[3rem] border border-white dark:border-gray-800 shadow-xl space-y-10">
+                <div className="flex items-center gap-4">
+                    <div className="p-3 bg-amber-100 dark:bg-amber-900/30 rounded-2xl">
+                        <User className="w-6 h-6 text-amber-600" />
+                    </div>
+                    <div>
+                        <h3 className="text-2xl font-serif text-gray-900 dark:text-white">Persona & Interests</h3>
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#D4AF37] mt-1">Help Trava understand your style</p>
+                    </div>
+                </div>
+
+                <div className="space-y-6">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Who's Coming Along?</label>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {["Solo", "Couple", "Family", "Friends"].map(p => (
+                            <button key={p} onClick={() => setFormData({ ...formData, persona: p })} className={`py-4 rounded-3xl text-xs font-black uppercase tracking-widest transition-all border transform active:scale-95 ${formData.persona === p ? 'bg-[#D4AF37] text-black border-[#D4AF37] shadow-xl shadow-amber-900/20 scale-105' : 'bg-white dark:bg-gray-800 text-gray-400 border-gray-100 dark:border-gray-700 hover:border-[#D4AF37] hover:text-[#D4AF37]'}`}>
+                                {p}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="space-y-6 pt-4">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Deep Dive (Select Multiple)</label>
+                    <div className="flex gap-3 flex-wrap">
+                        {["Heritage", "Nature", "Food", "Spiritual", "Arts", "Shopping", "Silk Weaving", "Yoga", "Palaces"].map(i => (
+                            <button key={i} onClick={() => toggleInterest(i)} className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border transform active:scale-95 ${formData.interests.includes(i) ? 'bg-[#D4AF37] text-white border-[#D4AF37] shadow-lg shadow-amber-900/10' : 'bg-white dark:bg-gray-800 text-gray-400 border-gray-100 dark:border-gray-700 hover:border-[#D4AF37] hover:text-[#D4AF37]'}`}>
+                                {i}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* Timeline & Pace Card */}
+            <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl p-8 md:p-10 rounded-[3rem] border border-white dark:border-gray-800 shadow-xl space-y-10">
+                <div className="flex items-center gap-4">
+                    <div className="p-3 bg-amber-100 dark:bg-[#D4AF37]/10 rounded-2xl">
+                        <Calendar className="w-6 h-6 text-[#D4AF37]" />
+                    </div>
+                    <div>
+                        <h3 className="text-2xl font-serif text-gray-900 dark:text-white">Timeline & Pace</h3>
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#D4AF37] mt-1">Calendar & intensity of the trip</p>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Start Date</label>
+                        <input type="date" value={formData.startDate} onChange={e => setFormData({ ...formData, startDate: e.target.value })} className="w-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 p-5 rounded-[1.5rem] text-sm font-bold focus:ring-4 focus:ring-[#D4AF37]/10 outline-none transition-all shadow-sm" />
+                    </div>
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">End Date</label>
+                        <input type="date" value={formData.endDate} onChange={e => setFormData({ ...formData, endDate: e.target.value })} className="w-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 p-5 rounded-[1.5rem] text-sm font-bold focus:ring-4 focus:ring-amber-500/10 outline-none transition-all shadow-sm" />
+                    </div>
+                </div>
+
+                <div className="space-y-6">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Exploration Pace</label>
+                    <div className="flex gap-4">
+                        {["Relaxed", "Balanced", "Intense"].map(p => (
+                            <button key={p} onClick={() => setFormData({ ...formData, pace: p })} className={`flex-1 py-5 rounded-3xl text-[10px] font-black uppercase tracking-widest transition-all border transform active:scale-95 ${formData.pace === p ? 'bg-black dark:bg-[#D4AF37] text-white dark:text-black border-black dark:border-[#D4AF37] shadow-xl' : 'bg-white dark:bg-gray-800 text-gray-400 border-gray-100 dark:border-gray-700 hover:border-black dark:hover:border-[#D4AF37]'}`}>
+                                {p}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Arrival Time</label>
+                        <div className="relative group">
+                            <Clock className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                            <input type="time" value={formData.arrivalTime} onChange={e => setFormData({ ...formData, arrivalTime: e.target.value })} className="w-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 pl-14 pr-6 py-5 rounded-[1.5rem] text-sm font-bold focus:ring-4 focus:ring-[#D4AF37]/10 outline-none transition-all shadow-sm" />
+                        </div>
+                    </div>
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Departure Time</label>
+                        <div className="relative group">
+                            <Clock className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                            <input type="time" value={formData.departureTime} onChange={e => setFormData({ ...formData, departureTime: e.target.value })} className="w-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 pl-14 pr-6 py-5 rounded-[1.5rem] text-sm font-bold focus:ring-4 focus:ring-[#D4AF37]/10 outline-none transition-all shadow-sm" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Budget & Comfort Card */}
+            <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl p-8 md:p-10 rounded-[3rem] border border-white dark:border-gray-800 shadow-xl space-y-10">
+                <div className="flex items-center gap-4">
+                    <div className="p-3 bg-amber-100 dark:bg-[#D4AF37]/10 rounded-2xl">
+                        <Database className="w-6 h-6 text-[#D4AF37]" />
+                    </div>
+                    <div>
+                        <h3 className="text-2xl font-serif text-gray-900 dark:text-white">Budget & Comfort</h3>
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#D4AF37] mt-1">Resource allocation & stay type</p>
+                    </div>
+                </div>
+
+                <div className="space-y-6">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Investment Level</label>
+                    <div className="flex gap-4">
+                        {["Budget", "Moderate", "Luxury"].map(b => (
+                            <button key={b} onClick={() => setFormData({ ...formData, budget: b })} className={`flex-1 py-5 rounded-3xl text-[10px] font-black uppercase tracking-widest transition-all border transform active:scale-95 ${formData.budget === b ? 'bg-black dark:bg-[#D4AF37] text-white dark:text-black border-black dark:border-[#D4AF37] shadow-xl' : 'bg-white dark:bg-gray-800 text-gray-400 border-gray-100 dark:border-gray-700 hover:border-black dark:hover:border-[#D4AF37]'}`}>
+                                {b}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="space-y-6">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Stay Preference</label>
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                        {["Hostel", "Homestay", "Comfort", "Grandeur"].map(a => (
+                            <button key={a} onClick={() => setFormData({ ...formData, accommodation: a })} className={`py-5 rounded-3xl text-[10px] font-black uppercase tracking-widest transition-all border transform active:scale-95 ${formData.accommodation === a ? 'bg-black dark:bg-[#D4AF37] text-white dark:text-black border-black dark:border-[#D4AF37] shadow-lg' : 'bg-white dark:bg-gray-800 text-gray-400 border-gray-100 dark:border-gray-700 hover:border-black dark:hover:border-[#D4AF37]'}`}>
+                                {a}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* Food & Motion Card */}
+            <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl p-8 md:p-10 rounded-[3rem] border border-white dark:border-gray-800 shadow-xl space-y-12">
+                <div className="flex items-center gap-4">
+                    <div className="p-3 bg-amber-100 dark:bg-[#D4AF37]/10 rounded-2xl">
+                        <Utensils className="w-6 h-6 text-[#D4AF37]" />
+                    </div>
+                    <div>
+                        <h3 className="text-2xl font-serif text-gray-900 dark:text-white">Food & Transport</h3>
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#D4AF37] mt-1">Sustenance & city traversal</p>
+                    </div>
+                </div>
+
+                <div className="space-y-6">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Culinary Path</label>
+                    <div className="flex gap-3 flex-wrap">
+                        {["ANYTHING", "VEGETARIAN", "NON-VEG", "VEGAN", "JAIN"].map(d => (
+                            <button key={d} onClick={() => setFormData({ ...formData, diet: d })} className={`flex-1 py-4 rounded-3xl text-[10px] font-black uppercase tracking-widest transition-all border transform active:scale-95 ${formData.diet === d ? 'bg-black dark:bg-[#D4AF37] text-white dark:text-black border-black dark:border-[#D4AF37] shadow-md' : 'bg-white dark:bg-gray-800 text-gray-400 border-gray-100 dark:border-gray-700 hover:border-black dark:hover:border-[#D4AF37]'}`}>
+                                {d}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div className="space-y-6">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Transit Mode</label>
+                        <div className="flex gap-4">
+                            {["Personal", "Rickshaw/Public"].map(t => (
+                                <button key={t} onClick={() => setFormData({ ...formData, transport: t })} className={`flex-1 py-5 rounded-3xl text-[10px] font-black uppercase tracking-widest transition-all border transform active:scale-95 ${formData.transport === t ? 'bg-black dark:bg-[#D4AF37] text-white dark:text-black border-black dark:border-[#D4AF37] shadow-md' : 'bg-white dark:bg-gray-800 text-gray-400 border-gray-100 dark:border-gray-700 hover:border-black dark:hover:border-[#D4AF37]'}`}>
+                                    {t}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="space-y-6">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Vehicle Preference</label>
+                        <div className="flex gap-4">
+                            {["Two Wheeler", "Four Wheeler"].map(v => (
+                                <button key={v} onClick={() => setFormData({ ...formData, vehicleType: v })} className={`flex-1 py-5 rounded-3xl text-[10px] font-black uppercase tracking-widest transition-all border transform active:scale-95 ${formData.vehicleType === v ? 'bg-black dark:bg-[#D4AF37] text-white dark:text-black border-black dark:border-[#D4AF37] shadow-md' : 'bg-white dark:bg-gray-800 text-gray-400 border-gray-100 dark:border-gray-700 hover:border-black dark:hover:border-[#D4AF37]'}`}>
+                                    {v}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Special Instructions Card */}
+            <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl p-8 md:p-10 rounded-[3rem] border border-white dark:border-gray-800 shadow-xl space-y-6">
+                <div className="flex items-center gap-4">
+                    <div className="p-3 bg-amber-100 dark:bg-[#D4AF37]/10 rounded-2xl">
+                        <FileText className="w-6 h-6 text-[#D4AF37]" />
+                    </div>
+                    <div>
+                        <h3 className="text-2xl font-serif text-gray-900 dark:text-white">Special Instructions</h3>
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#D4AF37] mt-1">Specific needs or custom requests</p>
+                    </div>
+                </div>
+                <textarea
+                    value={formData.specialRequests}
+                    onChange={e => setFormData({ ...formData, specialRequests: e.target.value })}
+                    placeholder="E.g., Traveling with seniors, need wheelchair access, interested in local oil painting workshops, prefer quiet mornings..."
+                    className="w-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 p-8 rounded-[2rem] text-sm md:text-base h-48 resize-none focus:ring-4 focus:ring-[#D4AF37]/10 outline-none transition-all placeholder:italic font-medium shadow-inner"
+                />
+            </div>
+
+            {/* Bottom Generation Action */}
+            <div className="max-w-4xl mx-auto w-full">
+                <button className="group relative w-full py-8 bg-black dark:bg-[#D4AF37] text-white dark:text-black rounded-[2.5rem] font-black text-sm uppercase tracking-[0.5em] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] dark:shadow-[0_30px_60px_-15px_rgba(212,175,55,0.3)] hover:scale-[1.02] active:scale-95 transition-all duration-500 overflow-hidden">
+                    <span className="relative z-10 flex items-center justify-center gap-3">
+                        Construct Your Heritage ID
+                        <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+                    </span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                </button>
+                <p className="text-center text-gray-400 text-[9px] font-black uppercase tracking-widest mt-8 flex items-center justify-center gap-2">
+                    <Shield className="w-3 h-3" /> Trava Gen Engine v2.4 Royal Update
+                </p>
+            </div>
+        </div>
+    );
+
+    return (
+        <div className="flex flex-col h-screen max-h-screen bg-[#F8F9FA] dark:bg-[#090909] transition-colors overflow-hidden font-sans">
+            {/* Immersive Cinematic Header */}
+            <div className="bg-gradient-to-br from-[#111111] via-[#1a1a1a] to-[#000000] p-10 pt-16 relative overflow-hidden shrink-0 shadow-2xl border-b border-[#D4AF37]/20">
+                {/* Dynamic Background Noise/Glows */}
+                <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/black-paper.png')]"></div>
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#D4AF37]/5 rounded-full blur-[120px] -mr-48 -mt-48 transition-all duration-1000"></div>
+                <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#D4AF37]/5 rounded-full blur-[100px] -ml-24 -mb-24"></div>
+
+                <button
+                    onClick={onBack}
+                    className="absolute left-6 top-8 w-12 h-12 bg-white/5 hover:bg-[#D4AF37]/10 backdrop-blur-xl border border-white/10 rounded-full flex items-center justify-center text-white transition-all hover:scale-110 active:scale-90 z-30"
+                >
+                    <ArrowLeft size={22} className="text-[#D4AF37]" />
+                </button>
+
+                <div className="flex flex-col items-center text-center space-y-4 relative z-10">
+                    <div className="flex items-center gap-4 animate-in zoom-in duration-700">
+                        <div className="w-16 h-16 bg-gradient-to-br from-[#D4AF37] to-[#B8962F] rounded-3xl flex items-center justify-center shadow-[0_0_20px_rgba(212,175,55,0.3)] border border-white/20 transform hover:rotate-12 transition-transform duration-500">
+                            <Sparkles className="text-black w-9 h-9 animate-pulse" />
+                        </div>
+                        <div className="text-left">
+                            <h2 className="text-[#D4AF37] text-5xl font-serif tracking-tight">Trava AI</h2>
+                            <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.4em] mt-1 ml-1 opacity-80">Heritage Intelligence</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="mt-12 flex justify-center">
+                    <div className="bg-black/40 backdrop-blur-3xl p-2 rounded-[2rem] flex border border-[#D4AF37]/20 shadow-3xl">
+                        <button
+                            onClick={() => setMode('chat')}
+                            className={`px-12 py-4 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-500 flex items-center gap-2 ${mode === 'chat' ? 'bg-[#D4AF37] text-black shadow-2xl scale-100' : 'text-gray-400 hover:text-[#D4AF37] hover:bg-white/5'}`}
+                        >
+                            <MessageSquare size={14} className={mode === 'chat' ? 'text-black' : 'text-gray-600'} />
+                            Chat Interface
+                        </button>
+                        <button
+                            onClick={() => setMode('planner')}
+                            className={`px-12 py-4 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-500 flex items-center gap-2 ${mode === 'planner' ? 'bg-[#D4AF37] text-black shadow-2xl scale-100' : 'text-gray-400 hover:text-[#D4AF37] hover:bg-white/5'}`}
+                        >
+                            <LayoutDashboard size={14} className={mode === 'planner' ? 'text-black' : 'text-gray-600'} />
+                            Dynamic Planner
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* Content Container */}
+            <div className="flex-1 overflow-hidden relative">
+                {/* Subtle Background pattern */}
+                <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/asfalt-dark.pattern')]"></div>
+                {mode === 'chat' ? renderChat() : renderPlanner()}
+            </div>
+        </div>
+    );
+};
 
 
 export const PartnerDashboard = ({ onLogout, partnerData }) => {
@@ -3898,19 +4463,107 @@ export const ToggleItem = ({ icon: _Icon, label, defaultChecked, checked, onTogg
 // --- STATIC DATA ---
 export const featuredPlaces = [
     {
-        id: 'karanji-lake',
-        title: "Karanji Lake",
-        category: "Nature",
-        categoryColor: "bg-green-500",
-        description: "Serene nature trail with butterfly park and panoramic palace views",
-        location: "Siddhartha Layout",
-        rating: 4.3,
-        coords: [12.3021, 76.6715],
-        image: "/karanji.jpg"
+        id: 'palace-illumination',
+        title: "Mysore Palace Illumination",
+        category: "Festival",
+        categoryColor: "bg-amber-500",
+        description: "The crown jewel of Dasara, glowing with nearly 100,000 incandescent bulbs in a majestic night display.",
+        location: "City Center",
+        rating: 4.9,
+        coords: [12.3051, 76.6551],
+        image: "https://images.unsplash.com/photo-1582298538104-fe2e74c27f59?auto=format&fit=crop&q=80&w=1000"
+    },
+    {
+        id: 'kr-circle-dasara',
+        title: "K.R. Circle Tower (Night)",
+        category: "Festival",
+        categoryColor: "bg-purple-600",
+        description: "The heart of Mysore glowing in festive light, centered around the iconic Maharaja Chamarajendra Wodeyar statue circle.",
+        location: "K.R. Circle",
+        rating: 4.8,
+        coords: [12.3051, 76.6551],
+        image: "https://images.unsplash.com/photo-1616422335193-4a0d92375537?auto=format&fit=crop&q=80&w=1000"
+    },
+    {
+        id: 'chamundi-night',
+        title: "Chamundi Hill Night View",
+        category: "Scenic",
+        categoryColor: "bg-blue-600",
+        description: "Witness the 'City of Lights' from 3,489 feet, where Mysore resembles a glowing carpet of gold.",
+        location: "Hill Top Viewpoint",
+        rating: 4.8,
+        coords: [12.2753, 76.6701],
+        image: "/chamundi.png"
+    },
+    {
+        id: 'philomena-night',
+        title: "St. Philomena's (Night)",
+        category: "Heritage",
+        categoryColor: "bg-indigo-600",
+        description: "The neo-gothic cathedral towers illuminated against the night sky, creating a mystical atmosphere.",
+        location: "Ashoka Road",
+        rating: 4.7,
+        coords: [12.3209, 76.6593],
+        image: "/philomena.png"
     }
 ];
 
 export const popularPlaces = [
+    {
+        id: 'mysore-palace',
+        title: "Mysore Palace (Amba Vilas)",
+        category: "Heritage",
+        categoryColor: "bg-amber-600",
+        description: "The city's crown jewel, renowned for its Indo-Saracenic architecture and opulent interiors.",
+        location: "City Center",
+        rating: 4.9,
+        coords: [12.3051, 76.6551],
+        image: "/src/assets/mysore-palace-daytime.jpg"
+    },
+    {
+        id: 'chamundi-hill',
+        title: "Chamundi Hill & Temple",
+        category: "Spiritual",
+        categoryColor: "bg-orange-500",
+        description: "A sacred site at 3,489 feet, dedicated to Goddess Chamundeshwari with a monolithic Nandi.",
+        location: "Chamundi Hills",
+        rating: 4.8,
+        coords: [12.2753, 76.6701],
+        image: "/chamundi.png"
+    },
+    {
+        id: 'st-philomenas',
+        title: "St. Philomena's Cathedral",
+        category: "Heritage",
+        categoryColor: "bg-indigo-600",
+        description: "One of the largest Gothic-style churches in Asia, inspired by Cologne Cathedral.",
+        location: "Ashoka Road",
+        rating: 4.7,
+        coords: [12.3209, 76.6593],
+        image: "/philomena.png"
+    },
+    {
+        id: 'mysore-zoo',
+        title: "Mysore Zoo (Sri Chamarajendra)",
+        category: "Nature",
+        categoryColor: "bg-green-600",
+        description: "One of the oldest and most diverse zoos in India, established in 1892.",
+        location: "Indiranagar",
+        rating: 4.6,
+        coords: [12.3021, 76.6644],
+        image: "/zoo.png"
+    },
+    {
+        id: 'jaganmohan-palace',
+        title: "Jaganmohan Palace",
+        category: "Heritage",
+        categoryColor: "bg-amber-700",
+        description: "An older palace containing a vast collection of royal artifacts and paintings.",
+        location: "City Center",
+        rating: 4.4,
+        coords: [12.3061, 76.6501],
+        image: "/jaganmohan.png"
+    },
     {
         id: 'karanji-lake',
         title: "Karanji Lake",
@@ -3921,6 +4574,193 @@ export const popularPlaces = [
         rating: 4.3,
         coords: [12.3021, 76.6715],
         image: "/karanji.jpg"
+    },
+    {
+        id: 'kukkarahalli-lake',
+        title: "Kukkarahalli Lake",
+        category: "Nature",
+        categoryColor: "bg-green-600",
+        description: "A favorite spot for birdwatchers and walkers, especially during sunset.",
+        location: "Saraswathipuram",
+        rating: 4.5,
+        coords: [12.3082, 76.6341],
+        image: "/kukkarahalli.png"
+    },
+    {
+        id: 'sand-sculpture',
+        title: "Sand Sculpture Museum",
+        category: "Heritage",
+        categoryColor: "bg-amber-600",
+        description: "Unique museum featuring intricate sand sculptures of heritage themes.",
+        location: "Chamundi Hill Road",
+        rating: 4.4,
+        coords: [12.2855, 76.6782],
+        image: "/sand_sculpture.png"
+    },
+    {
+        id: 'rail-museum',
+        title: "Mysore Rail Museum",
+        category: "Heritage",
+        categoryColor: "bg-amber-700",
+        description: "Features vintage locomotives and galleries documenting rail history.",
+        location: "KRS Road",
+        rating: 4.6,
+        coords: [12.3168, 76.6434],
+        image: "/rail_museum.png"
+    },
+    {
+        id: 'lingambudhi-lake',
+        title: "Lingambudhi Lake",
+        category: "Nature",
+        categoryColor: "bg-green-500",
+        description: "A tranquil perennial lake known for its biodiversity and walking paths.",
+        location: "Ramakrishna Nagar",
+        rating: 4.2,
+        coords: [12.2685, 76.6214],
+        image: "/lingambudhi.png"
+    },
+    {
+        id: 'sandalwood-carving',
+        title: "Sandalwood Carving Artisan",
+        category: "Artisans",
+        categoryColor: "bg-rose-600",
+        description: "Authentic workshop showing the delicate art of carving Mysore sandalwood.",
+        location: "Mandi Mohalla",
+        rating: 4.8,
+        coords: [12.3214, 76.6521],
+        image: "/sandalwood.png"
+    },
+    {
+        id: 'silk-weaving',
+        title: "Mysore Silk Weaving",
+        category: "Artisans",
+        categoryColor: "bg-rose-500",
+        description: "Witness the creation of the world-famous Mysore Silk sarees with gold zari.",
+        location: "KSIC Factory",
+        rating: 4.7,
+        coords: [12.2905, 76.6452],
+        image: "/silk.png"
+    },
+    {
+        id: 'mylari-dosa',
+        title: "Original Mylari Dosa",
+        category: "Food",
+        categoryColor: "bg-emerald-600",
+        description: "Legendary breakfast spot known for its unique, cloud-soft butter dosas.",
+        location: "Nazarbad",
+        rating: 4.9,
+        coords: [12.3090, 76.6660],
+        image: "/mylari.png"
+    },
+    {
+        id: 'mysore-pak',
+        title: "Traditional Mysore Pak",
+        category: "Food",
+        categoryColor: "bg-emerald-500",
+        description: "Taste the authentic melt-in-your-mouth sweet that defined Mysore's cuisine.",
+        location: "Guru Sweets",
+        rating: 4.8,
+        coords: [12.3045, 76.6545],
+        image: "/mysorepak.png"
+    },
+    {
+        id: 'devaraja-market',
+        title: "Devaraja Market",
+        category: "Heritage",
+        categoryColor: "bg-amber-600",
+        description: "Vibrant local market with piles of kumkum, flowers, and local produce.",
+        location: "City Center",
+        rating: 4.6,
+        coords: [12.3105, 76.6515],
+        image: "/devaraja.png"
+    },
+    {
+        id: 'chamundi-trek',
+        title: "Chamundi Hill Steps Trek",
+        category: "Adventure",
+        categoryColor: "bg-orange-600",
+        description: "Challenge yourself with the 1,008 steps climb to the summit for breathtaking city views.",
+        location: "Chamundi Hills",
+        rating: 4.9,
+        coords: [12.2753, 76.6701],
+        image: "https://images.unsplash.com/photo-1551632432-c735eef10bc1?auto=format&fit=crop&q=80&w=1000"
+    },
+    {
+        id: 'varuna-lake',
+        title: "Varuna Lake Water Sports",
+        category: "Adventure",
+        categoryColor: "bg-orange-600",
+        description: "Enjoy jet skiing, kayaking, and banana boat rides on the outskirts of the city.",
+        location: "T. Narsipura Road",
+        rating: 4.5,
+        coords: [12.2612, 76.7123],
+        image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&q=80&w=1000"
+    },
+    {
+        id: 'grs-fantasy',
+        title: "GRS Fantasy Park",
+        category: "Adventure",
+        categoryColor: "bg-orange-600",
+        description: "Mysuru's premier water & amusement park with thrilling slides and a virtual 5D ride.",
+        location: "KRS Road (8km)",
+        rating: 4.6,
+        coords: [12.3524, 76.6214],
+        image: "https://images.unsplash.com/photo-1513889961551-6ad87a513c7a?auto=format&fit=crop&q=80&w=1000"
+    },
+    {
+        id: 'kunti-betta',
+        title: "Kunti Betta Night Trek",
+        category: "Adventure",
+        categoryColor: "bg-orange-600",
+        description: "A thrilling night trek near Pandavapura, famous for its sunrise and Tonnur Lake view.",
+        location: "Pandavapura (28km)",
+        rating: 4.8,
+        coords: [12.4812, 76.6715],
+        image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=1000"
+    },
+    {
+        id: 'srirangapatna-coracle',
+        title: "Srirangapatna Coracle Ride",
+        category: "Adventure",
+        categoryColor: "bg-orange-600",
+        description: "Experience a traditional coracle ride through the Cauvery at the Sangama holy site.",
+        location: "Srirangapatna (18km)",
+        rating: 4.4,
+        coords: [12.4258, 76.6575],
+        image: "https://images.unsplash.com/photo-1504198453319-5ce911baf2ea?auto=format&fit=crop&q=80&w=1000"
+    },
+    {
+        id: 'balmuri-falls',
+        title: "Balmuri Falls Splash",
+        category: "Adventure",
+        categoryColor: "bg-orange-600",
+        description: "A popular spot for river walks, photography and a refreshing splash in the Cauvery.",
+        location: "KRS Road (15km)",
+        rating: 4.3,
+        coords: [12.4214, 76.5912],
+        image: "https://images.unsplash.com/photo-1433086566547-0243403505bb?auto=format&fit=crop&q=80&w=1000"
+    },
+    {
+        id: 'lalitha-mahal-stay',
+        title: "Lalitha Mahal Palace",
+        category: "Stays",
+        categoryColor: "bg-purple-600",
+        description: "Live like royalty in this glistening white palace hotel built for the Maharaja's guests.",
+        location: "Siddharta Nagar",
+        rating: 4.8,
+        coords: [12.3021, 76.6912],
+        image: "/lalithmahal.png"
+    },
+    {
+        id: 'metropole-stay',
+        title: "Royal Orchid Metropole",
+        category: "Stays",
+        categoryColor: "bg-purple-600",
+        description: "Heritage hotel offering vintage charm and personalized luxury in a quiet enclave.",
+        location: "JLB Road",
+        rating: 4.7,
+        coords: [12.3061, 76.6412],
+        image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=1000"
     }
 ];
 
@@ -3935,7 +4775,7 @@ export const allPlaces = Array.from(allPlacesMap.values());
 function App() {
     const [isLoading, setIsLoading] = useState(true);
     const [isAuthRestoring, setIsAuthRestoring] = useState(true); // New state for initial check
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(() => !!localStorage.getItem('userData'));
     const [isSignUp, setIsSignUp] = useState(false);
     const [userRole, setUserRole] = useState(() => {
         const saved = localStorage.getItem('userData');
@@ -3959,6 +4799,7 @@ function App() {
         const saved = localStorage.getItem('activeTab');
         return (saved && saved !== 'details') ? saved : 'home';
     });
+    const [selectedCategory, setSelectedCategory] = useState(null);
     const [selectedPlace, setSelectedPlace] = useState(null);
     const [mapDestination, setMapDestination] = useState(null);
     const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -4288,13 +5129,25 @@ function App() {
                         }}
                     />
                 );
+            case 'planner':
+                return <TravaAI onBack={() => setActiveTab('home')} />;
             case 'home':
                 return (
                     <>
                         <Hero onExploreClick={() => setActiveTab('explore')} />
-                        <Categories onSeeAllClick={() => setActiveTab('explore')} />
+                        <Categories
+                            onSeeAllClick={() => {
+                                setSelectedCategory(null);
+                                setActiveTab('explore');
+                            }}
+                            onCategoryClick={(category) => {
+                                setSelectedCategory(category);
+                                setActiveTab('explore');
+                            }}
+                            selectedCategory={selectedCategory}
+                        />
                         <FeaturedSection
-                            places={spots}
+                            places={spots.slice(0, 4)}
                             onCardClick={handleFeaturedCardClick}
                             savedPlaceIds={savedPlaceIds}
                             onToggleSave={toggleSave}
@@ -4310,6 +5163,8 @@ function App() {
                         savedPlaceIds={savedPlaceIds}
                         onToggleSave={toggleSave}
                         onCardClick={handlePlaceClick}
+                        selectedCategory={selectedCategory}
+                        onCategoryClick={setSelectedCategory}
                     />
                 );
             case 'MapComponent':
@@ -4349,7 +5204,10 @@ function App() {
                         <Navbar
                             onProfileClick={() => setActiveTab('profile')}
                             activeTab={activeTab}
-                            setActiveTab={setActiveTab}
+                            setActiveTab={(id) => {
+                                if (id === 'explore') setSelectedCategory(null);
+                                setActiveTab(id);
+                            }}
                         />
                     </div>
                 </div>
@@ -4365,6 +5223,11 @@ function App() {
                 <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 pb-[env(safe-area-inset-bottom)] bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-t border-gray-100 dark:border-gray-800">
                     <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
                 </div>
+            )}
+
+            {/* Premium Heritage Guide ChatBot */}
+            {isAuthenticated && userRole === 'user' && activeTab !== 'profile' && activeTab !== 'details' && activeTab !== 'planner' && (
+                <ChatBot />
             )}
         </div>
     );
