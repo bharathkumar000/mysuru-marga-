@@ -88,7 +88,7 @@ export const ChatBot = () => {
         setIsLoading(true);
 
         try {
-            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
             const prompt = `You are a Heritage Guide to the City of Palaces, Mysuru (Mysore). Answer in a royal, polite, and helpful tone. Keep responses somewhat brief. User query: ${userMessage}`;
             const result = await model.generateContent(prompt);
             const responseText = result.response.text();
@@ -405,8 +405,8 @@ export const Explore = ({ places, onCardClick, savedPlaceIds = [], onToggleSave,
     });
 
     return (
-        <div className="pb-32 bg-mysore-50 dark:bg-gray-950 min-h-screen">
-            <div className="sticky top-0 bg-mysore-50/80 dark:bg-gray-950/80 backdrop-blur-xl z-30 px-8 md:px-12 py-6 border-b border-gray-100 dark:border-gray-900 transition-all">
+        <div className="pb-32 bg-transparent min-h-screen">
+            <div className="sticky top-0 bg-transparent backdrop-blur-3xl z-30 px-8 md:px-12 py-6 border-b border-[#D4AF37]/10 transition-all">
                 <div className="relative w-full">
                     <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <input
@@ -2900,7 +2900,7 @@ export const TravaAI = ({ onBack }) => {
         setIsTravaLoading(true);
 
         try {
-            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
             const prompt = `You are Trava AI, an intelligent personal travel companion for Mysuru (Mysore). Be very helpful, knowledgeable, and suggest highly practical travel tips, itineraries, and facts based on the city's rich heritage. Format your output clearly. User query: ${userMessage}`;
             const result = await model.generateContent(prompt);
             const responseText = result.response.text();
@@ -2916,7 +2916,7 @@ export const TravaAI = ({ onBack }) => {
     const generatePlanner = async () => {
         setIsTravaLoading(true);
         try {
-            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
             const prompt = `Generate a detailed Mysuru travel itinerary based on these user preferences:
 Theme/Identity: ${formData.tripName || 'My Mysuru Trip'}
 Starting City: ${formData.startingFrom || 'Anywhere'}
@@ -5557,7 +5557,7 @@ function App() {
         }
     };
     return (
-        <div className="min-h-screen w-full bg-mysore-light dark:bg-mysore-dark transition-colors duration-200 selection:bg-[#D4AF37]/30 flex flex-col relative pb-24 md:pb-0">
+        <div className="min-h-screen w-full bg-mysore-light dark:bg-mysore-dark bg-fixed transition-colors duration-200 selection:bg-[#D4AF37]/30 flex flex-col relative pb-24 md:pb-0">
             {activeTab !== 'profile' && activeTab !== 'details' && (
                 <div className="sticky top-0 z-40 bg-mysore-light/80 dark:bg-mysore-dark/80 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800 pt-[env(safe-area-inset-top)] pb-2 shadow-sm">
                     <div className="max-w-7xl mx-auto w-full">
