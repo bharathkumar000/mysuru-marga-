@@ -2904,13 +2904,34 @@ export const AuthPage = ({ onLogin, onSignUp }) => {
 
 
 export const TravaAI = ({ onBack }) => {
-    const [mode, setMode] = useState('chat'); // 'chat' or 'planner'
+    const [mode, setMode] = useState('chat'); // 'chat', 'planner', or 'budget'
     const [headerHidden, setHeaderHidden] = useState(false);
     const [showInviteModal, setShowInviteModal] = useState(false);
     const [inviteName, setInviteName] = useState('');
     const [inviteCopied, setInviteCopied] = useState(false);
     const lastScrollY = useRef(0);
     const contentRef = useRef(null);
+
+    // Budget Splitter State
+    const [friends, setFriends] = useState(() => {
+        const saved = localStorage.getItem('trip_friends');
+        return saved ? JSON.parse(saved) : ['You'];
+    });
+    const [expenses, setExpenses] = useState(() => {
+        const saved = localStorage.getItem('trip_expenses');
+        return saved ? JSON.parse(saved) : [];
+    });
+    const [newFriend, setNewFriend] = useState('');
+    const [newExpense, setNewExpense] = useState({ description: '', amount: '', paidBy: 'You', splitAmong: [] });
+    const [showAddExpense, setShowAddExpense] = useState(false);
+
+    // Persist budget data
+    useEffect(() => {
+        localStorage.setItem('trip_friends', JSON.stringify(friends));
+    }, [friends]);
+    useEffect(() => {
+        localStorage.setItem('trip_expenses', JSON.stringify(expenses));
+    }, [expenses]);
 
     const handleInvite = () => {
         const inviteLink = `${window.location.origin}?invite=trip&from=${encodeURIComponent(inviteName || 'A Friend')}`;
@@ -3091,8 +3112,274 @@ Please provide a highly structured, day-by-day (or logical if dates are flexible
         </div>
     );
 
+    const addFriend = () => {
+        if (newFriend.trim() && !friends.includes(newFriend.trim())) {
+            setFriends(prev => [...prev, newFriend.trim()]);
+            setNewFriend('');
+        }
+    };
+
+    const addExpense = () => {
+        if (!newExpense.description.trim() || !newExpense.amount || Number(newExpense.amount) <= 0) return;
+        const splitList = newExpense.splitAmong.length > 0 ? newExpense.splitAmong : friends;
+        setExpenses(prev => [...prev, {
+            id: Date.now(),
+            description: newExpense.description,
+            amount: Number(newExpense.amount),
+            paidBy: newExpense.paidBy,
+            splitAmong: splitList,
+            date: new Date().toLocaleDateString()
+        }]);
+        setNewExpense({ description: '', amount: '', paidBy: 'You', splitAmong: [] });
+        setShowAddExpense(false);
+    };
+
+    const deleteExpense = (id) => {
+        setExpenses(prev => prev.filter(e => e.id !== id));
+    };
+
+    const getSettlements = () => {
+        const balances = {};
+        friends.forEach(f => balances[f] = 0);
+
+        expenses.forEach(exp => {
+            const perPerson = exp.amount / exp.splitAmong.length;
+            balances[exp.paidBy] = (balances[exp.paidBy] || 0) + exp.amount;
+            exp.splitAmong.forEach(person => {
+                balances[person] = (balances[person] || 0) - perPerson;
+            });
+        });
+
+        const debtors = [];
+        const creditors = [];
+        Object.entries(balances).forEach(([person, balance]) => {
+            if (balance < -0.01) debtors.push({ person, amount: -balance });
+            else if (balance > 0.01) creditors.push({ person, amount: balance });
+        });
+
+        debtors.sort((a, b) => b.amount - a.amount);
+        creditors.sort((a, b) => b.amount - a.amount);
+
+        const settlements = [];
+        let i = 0, j = 0;
+        while (i < debtors.length && j < creditors.length) {
+            const amount = Math.min(debtors[i].amount, creditors[j].amount);
+            if (amount > 0.01) {
+                settlements.push({ from: debtors[i].person, to: creditors[j].person, amount: amount.toFixed(0) });
+            }
+            debtors[i].amount -= amount;
+            creditors[j].amount -= amount;
+            if (debtors[i].amount < 0.01) i++;
+            if (creditors[j].amount < 0.01) j++;
+        }
+        return settlements;
+    };
+
+    const totalExpenses = expenses.reduce((s, e) => s + e.amount, 0);
+
+    const renderBudgetSplitter = () => (
+        <div className="px-6 md:px-12 pt-8 pb-40 space-y-8 animate-in slide-in-from-bottom-4 duration-700">
+            {/* Summary Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="p-5 bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl rounded-[2rem] border border-white dark:border-gray-800 shadow-lg">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Total Spent</p>
+                    <p className="text-3xl font-serif text-gray-900 dark:text-white">₹{totalExpenses.toLocaleString()}</p>
+                </div>
+                <div className="p-5 bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl rounded-[2rem] border border-white dark:border-gray-800 shadow-lg">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Per Person</p>
+                    <p className="text-3xl font-serif text-gray-900 dark:text-white">₹{friends.length > 0 ? (totalExpenses / friends.length).toFixed(0) : 0}</p>
+                </div>
+                <div className="p-5 bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl rounded-[2rem] border border-white dark:border-gray-800 shadow-lg col-span-2 md:col-span-1">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Trip Members</p>
+                    <p className="text-3xl font-serif text-gray-900 dark:text-white">{friends.length}</p>
+                </div>
+            </div>
+
+            {/* Friends Section */}
+            <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl p-6 md:p-8 rounded-[2.5rem] border border-white dark:border-gray-800 shadow-xl">
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2.5 bg-[#D4AF37]/10 rounded-2xl">
+                            <Users className="w-5 h-5 text-[#D4AF37]" />
+                        </div>
+                        <h3 className="text-xl font-serif text-gray-900 dark:text-white">Trip Members</h3>
+                    </div>
+                </div>
+                <div className="flex flex-wrap gap-3 mb-4">
+                    {friends.map((f, i) => (
+                        <div key={i} className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700">
+                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#D4AF37] to-[#B8962F] flex items-center justify-center text-[10px] font-black text-black">
+                                {f.charAt(0).toUpperCase()}
+                            </div>
+                            <span className="text-sm font-bold text-gray-700 dark:text-gray-300">{f}</span>
+                            {f !== 'You' && (
+                                <button onClick={() => setFriends(prev => prev.filter(p => p !== f))} className="ml-1 text-gray-300 hover:text-red-500 transition-colors">
+                                    <X size={14} />
+                                </button>
+                            )}
+                        </div>
+                    ))}
+                </div>
+                <div className="flex gap-3">
+                    <input
+                        value={newFriend}
+                        onChange={(e) => setNewFriend(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && addFriend()}
+                        placeholder="Add friend's name..."
+                        className="flex-1 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl py-3.5 px-5 text-sm font-medium focus:ring-4 focus:ring-[#D4AF37]/10 outline-none transition-all"
+                    />
+                    <button onClick={addFriend} className="px-6 py-3.5 bg-black dark:bg-[#D4AF37] text-white dark:text-black rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
+                        <Plus size={16} /> Add
+                    </button>
+                </div>
+            </div>
+
+            {/* Add Expense */}
+            <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl p-6 md:p-8 rounded-[2.5rem] border border-white dark:border-gray-800 shadow-xl">
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2.5 bg-emerald-100 dark:bg-emerald-900/20 rounded-2xl">
+                            <IndianRupee className="w-5 h-5 text-emerald-600" />
+                        </div>
+                        <h3 className="text-xl font-serif text-gray-900 dark:text-white">Expenses</h3>
+                    </div>
+                    <button onClick={() => setShowAddExpense(!showAddExpense)} className="px-5 py-2.5 bg-[#D4AF37]/10 text-[#D4AF37] rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-[#D4AF37]/20 transition-all flex items-center gap-2">
+                        <Plus size={14} /> {showAddExpense ? 'Cancel' : 'New Expense'}
+                    </button>
+                </div>
+
+                {showAddExpense && (
+                    <div className="mb-6 p-5 bg-gray-50 dark:bg-gray-800/50 rounded-[2rem] border border-gray-100 dark:border-gray-700 space-y-4 animate-in slide-in-from-top-2 duration-300">
+                        <input
+                            value={newExpense.description}
+                            onChange={(e) => setNewExpense(p => ({ ...p, description: e.target.value }))}
+                            placeholder="What was it for? e.g., Palace tickets, lunch..."
+                            className="w-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl py-4 px-5 text-sm font-medium focus:ring-4 focus:ring-[#D4AF37]/10 outline-none transition-all"
+                        />
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2 mb-1.5 block">Amount (₹)</label>
+                                <input
+                                    type="number"
+                                    value={newExpense.amount}
+                                    onChange={(e) => setNewExpense(p => ({ ...p, amount: e.target.value }))}
+                                    placeholder="0"
+                                    className="w-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl py-4 px-5 text-sm font-bold focus:ring-4 focus:ring-[#D4AF37]/10 outline-none transition-all"
+                                />
+                            </div>
+                            <div>
+                                <label className="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2 mb-1.5 block">Paid By</label>
+                                <select
+                                    value={newExpense.paidBy}
+                                    onChange={(e) => setNewExpense(p => ({ ...p, paidBy: e.target.value }))}
+                                    className="w-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl py-4 px-5 text-sm font-bold appearance-none focus:ring-4 focus:ring-[#D4AF37]/10 outline-none transition-all cursor-pointer"
+                                >
+                                    {friends.map(f => <option key={f} value={f}>{f}</option>)}
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label className="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-2 mb-2 block">Split Among (leave empty for everyone)</label>
+                            <div className="flex flex-wrap gap-2">
+                                {friends.map(f => (
+                                    <button
+                                        key={f}
+                                        onClick={() => {
+                                            setNewExpense(p => ({
+                                                ...p,
+                                                splitAmong: p.splitAmong.includes(f)
+                                                    ? p.splitAmong.filter(x => x !== f)
+                                                    : [...p.splitAmong, f]
+                                            }));
+                                        }}
+                                        className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border active:scale-95 ${newExpense.splitAmong.includes(f)
+                                            ? 'bg-[#D4AF37] text-black border-[#D4AF37]'
+                                            : 'bg-white dark:bg-gray-800 text-gray-400 border-gray-200 dark:border-gray-700 hover:border-[#D4AF37]'
+                                            }`}
+                                    >
+                                        {f}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        <button onClick={addExpense} className="w-full py-4 bg-black dark:bg-[#D4AF37] text-white dark:text-black rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg hover:scale-[1.02] active:scale-95 transition-all">
+                            Add Expense
+                        </button>
+                    </div>
+                )}
+
+                {/* Expense List */}
+                <div className="space-y-3">
+                    {expenses.length === 0 ? (
+                        <div className="py-12 text-center">
+                            <IndianRupee className="w-10 h-10 text-gray-200 mx-auto mb-3" />
+                            <p className="text-sm text-gray-400 font-medium">No expenses yet. Add your first one!</p>
+                        </div>
+                    ) : (
+                        expenses.map(exp => (
+                            <div key={exp.id} className="flex items-center justify-between p-4 bg-white dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-gray-700 group">
+                                <div className="flex items-center gap-3 flex-1 min-w-0">
+                                    <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center shrink-0">
+                                        <IndianRupee className="w-4 h-4 text-emerald-600" />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <p className="text-sm font-bold text-gray-900 dark:text-white truncate">{exp.description}</p>
+                                        <p className="text-[10px] text-gray-400 font-medium">{exp.paidBy} paid · {exp.date} · Split with {exp.splitAmong.length}</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3 shrink-0">
+                                    <span className="text-lg font-black text-gray-900 dark:text-white">₹{exp.amount.toLocaleString()}</span>
+                                    <button onClick={() => deleteExpense(exp.id)} className="opacity-0 group-hover:opacity-100 p-1.5 text-gray-300 hover:text-red-500 rounded-lg transition-all">
+                                        <Trash2 size={14} />
+                                    </button>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+            </div>
+
+            {/* Settlements */}
+            {expenses.length > 0 && (
+                <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl p-6 md:p-8 rounded-[2.5rem] border border-white dark:border-gray-800 shadow-xl">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="p-2.5 bg-amber-100 dark:bg-amber-900/20 rounded-2xl">
+                            <TrendingUp className="w-5 h-5 text-amber-600" />
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-serif text-gray-900 dark:text-white">Settlements</h3>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-[#D4AF37]">Who owes whom</p>
+                        </div>
+                    </div>
+                    <div className="space-y-3">
+                        {getSettlements().length === 0 ? (
+                            <div className="py-8 text-center">
+                                <Check className="w-10 h-10 text-emerald-400 mx-auto mb-2" />
+                                <p className="text-sm text-gray-500 font-bold">All settled up! 🎉</p>
+                            </div>
+                        ) : (
+                            getSettlements().map((s, i) => (
+                                <div key={i} className="flex items-center gap-4 p-4 bg-amber-50/50 dark:bg-amber-900/10 rounded-2xl border border-amber-100/50 dark:border-amber-800/30">
+                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-red-400 to-red-500 flex items-center justify-center text-[10px] font-black text-white">
+                                        {s.from.charAt(0)}
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="text-sm font-bold text-gray-900 dark:text-white">
+                                            <span className="text-red-500">{s.from}</span> owes <span className="text-emerald-600">{s.to}</span>
+                                        </p>
+                                    </div>
+                                    <span className="text-lg font-black text-[#D4AF37]">₹{Number(s.amount).toLocaleString()}</span>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+
     const renderPlanner = () => (
-        <div className="h-full overflow-y-auto px-8 md:px-12 pt-10 pb-40 space-y-12 animate-in slide-in-from-bottom-4 duration-1000 custom-scrollbar">
+        <div className="px-8 md:px-12 pt-10 pb-40 space-y-12 animate-in slide-in-from-bottom-4 duration-1000">
             {/* Trip Essentials Card */}
             <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl p-8 md:p-10 rounded-[3rem] border border-white dark:border-gray-800 shadow-xl space-y-8">
                 <div className="flex items-center gap-4">
@@ -3402,17 +3689,24 @@ Please provide a highly structured, day-by-day (or logical if dates are flexible
                     <div className="bg-black/40 backdrop-blur-3xl p-2 rounded-[2rem] flex border border-[#D4AF37]/20 shadow-3xl">
                         <button
                             onClick={() => setMode('chat')}
-                            className={`px-12 py-4 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-500 flex items-center gap-2 ${mode === 'chat' ? 'bg-[#D4AF37] text-black shadow-2xl scale-100' : 'text-gray-400 hover:text-[#D4AF37] hover:bg-white/5'}`}
+                            className={`px-8 md:px-12 py-4 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-500 flex items-center gap-2 ${mode === 'chat' ? 'bg-[#D4AF37] text-black shadow-2xl scale-100' : 'text-gray-400 hover:text-[#D4AF37] hover:bg-white/5'}`}
                         >
                             <MessageSquare size={14} className={mode === 'chat' ? 'text-black' : 'text-gray-600'} />
-                            Chat Interface
+                            Chat
                         </button>
                         <button
                             onClick={() => setMode('planner')}
-                            className={`px-12 py-4 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-500 flex items-center gap-2 ${mode === 'planner' ? 'bg-[#D4AF37] text-black shadow-2xl scale-100' : 'text-gray-400 hover:text-[#D4AF37] hover:bg-white/5'}`}
+                            className={`px-8 md:px-12 py-4 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-500 flex items-center gap-2 ${mode === 'planner' ? 'bg-[#D4AF37] text-black shadow-2xl scale-100' : 'text-gray-400 hover:text-[#D4AF37] hover:bg-white/5'}`}
                         >
                             <LayoutDashboard size={14} className={mode === 'planner' ? 'text-black' : 'text-gray-600'} />
-                            Dynamic Planner
+                            Planner
+                        </button>
+                        <button
+                            onClick={() => setMode('budget')}
+                            className={`px-8 md:px-12 py-4 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-500 flex items-center gap-2 ${mode === 'budget' ? 'bg-[#D4AF37] text-black shadow-2xl scale-100' : 'text-gray-400 hover:text-[#D4AF37] hover:bg-white/5'}`}
+                        >
+                            <IndianRupee size={14} className={mode === 'budget' ? 'text-black' : 'text-gray-600'} />
+                            Split
                         </button>
                     </div>
                 </div>
@@ -3422,7 +3716,7 @@ Please provide a highly structured, day-by-day (or logical if dates are flexible
             <div ref={contentRef} className="flex-1 overflow-y-auto overflow-x-hidden relative">
                 {/* Subtle Background pattern */}
                 <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/asfalt-dark.pattern')]"></div>
-                {mode === 'chat' ? renderChat() : renderPlanner()}
+                {mode === 'chat' ? renderChat() : mode === 'planner' ? renderPlanner() : renderBudgetSplitter()}
             </div>
 
             {/* Invite Friend Modal */}
