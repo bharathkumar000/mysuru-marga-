@@ -4039,34 +4039,6 @@ export const PartnerOverviewTab = ({ spot, setActiveTab, feedbacks }) => {
                 </div>
             </div>
 
-            {/* Spot Preview */}
-            <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl rounded-[2.5rem] p-10 shadow-xl border border-gray-100 dark:border-gray-800 transition-all hover:scale-[1.01]">
-                <div className="flex flex-col lg:flex-row gap-10">
-                    <div className="w-full lg:w-1/3 h-64 rounded-3xl overflow-hidden shadow-2xl relative">
-                        <img src="/karanji.jpg" alt="Spot Preview" className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                    </div>
-                    <div className="flex-1 flex flex-col justify-center">
-                        <div className="flex items-center gap-2 mb-4">
-                            <span className="px-4 py-1.5 bg-[#D4AF37]/10 text-[#D4AF37] rounded-full text-[10px] font-black uppercase tracking-widest ring-1 ring-[#D4AF37]/20">{spot.category}</span>
-                        </div>
-                        <h3 className="text-3xl font-serif text-black dark:text-white mb-4">{spot.name}</h3>
-                        <p className="text-gray-500 dark:text-gray-400 line-clamp-2 md:line-clamp-none mb-8 font-medium leading-relaxed text-sm">
-                            {spot.description}
-                        </p>
-                        <div className="flex flex-wrap gap-8 text-[11px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">
-                            <div className="flex items-center gap-3">
-                                <MapPin size={16} className="text-[#D4AF37]" />
-                                <span>{spot.location}</span>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <Clock size={16} className="text-[#D4AF37]" />
-                                <span>{spot.openingHours}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             {/* Quick Actions */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
