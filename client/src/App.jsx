@@ -412,7 +412,7 @@ export const Explore = ({ places, onCardClick, savedPlaceIds = [], onToggleSave,
 
     return (
         <div className="pb-32 bg-transparent min-h-screen">
-            <div className="sticky top-[80px] md:top-[88px] bg-transparent backdrop-blur-xl z-30 px-6 md:px-12 py-4 md:py-6 transition-all border-b border-white/10 dark:border-gray-900/50">
+            <div className="sticky top-[80px] md:top-[88px] bg-transparent z-30 px-6 md:px-12 py-4 md:py-6 transition-all">
                 <div className="relative w-full">
                     <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <input
