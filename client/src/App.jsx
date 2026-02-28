@@ -2905,6 +2905,29 @@ export const AuthPage = ({ onLogin, onSignUp }) => {
 
 export const TravaAI = ({ onBack }) => {
     const [mode, setMode] = useState('chat'); // 'chat' or 'planner'
+    const [headerHidden, setHeaderHidden] = useState(false);
+    const lastScrollY = useRef(0);
+    const contentRef = useRef(null);
+
+    // Scroll-aware header: hide on scroll down, show on scroll up
+    useEffect(() => {
+        const container = contentRef.current;
+        if (!container) return;
+
+        const handleScroll = () => {
+            const currentY = container.scrollTop;
+            if (currentY > lastScrollY.current && currentY > 80) {
+                setHeaderHidden(true);
+            } else {
+                setHeaderHidden(false);
+            }
+            lastScrollY.current = currentY;
+        };
+
+        container.addEventListener('scroll', handleScroll, { passive: true });
+        return () => container.removeEventListener('scroll', handleScroll);
+    }, [mode]);
+
     const [formData, setFormData] = useState({
         tripName: '',
         startingFrom: '',
@@ -3323,7 +3346,7 @@ Please provide a highly structured, day-by-day (or logical if dates are flexible
     return (
         <div className="fixed inset-0 z-[100] flex flex-col h-screen max-h-screen bg-transparent transition-colors overflow-hidden font-sans">
             {/* Immersive Cinematic Header */}
-            <div className="bg-gradient-to-br from-[#111111] via-[#1a1a1a] to-[#000000] p-10 pt-16 relative overflow-hidden shrink-0 shadow-2xl border-b border-[#D4AF37]/20">
+            <div className={`bg-gradient-to-br from-[#111111] via-[#1a1a1a] to-[#000000] p-10 pt-16 relative overflow-hidden shrink-0 shadow-2xl border-b border-[#D4AF37]/20 transition-all duration-500 ease-in-out ${headerHidden ? '-translate-y-full max-h-0 p-0 opacity-0 border-0' : 'translate-y-0 max-h-[500px] opacity-100'}`}>
                 {/* Dynamic Background Noise/Glows */}
                 <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/black-paper.png')]"></div>
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#D4AF37]/5 rounded-full blur-[120px] -mr-48 -mt-48 transition-all duration-1000"></div>
@@ -3369,7 +3392,7 @@ Please provide a highly structured, day-by-day (or logical if dates are flexible
             </div>
 
             {/* Content Container */}
-            <div className="flex-1 overflow-hidden relative">
+            <div ref={contentRef} className="flex-1 overflow-y-auto overflow-x-hidden relative">
                 {/* Subtle Background pattern */}
                 <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/asfalt-dark.pattern')]"></div>
                 {mode === 'chat' ? renderChat() : renderPlanner()}
